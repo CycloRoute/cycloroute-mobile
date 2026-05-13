@@ -111,7 +111,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
                     height: screenHeight,
                     child: NavigationMapWidget(
                       routeName: activeRoute.name,
-                      currentLocation: locationProvider.currentLocation ??
+                      currentLocation:
+                          locationProvider.currentLocation ??
                           LatLng(37.4219983, -122.084),
                     ),
                   ),
@@ -152,22 +153,14 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           children: [
                             Text(
                               activeRoute.name,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               '45% of route completed',
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                    color: AppColors.textSecondary,
-                                  ),
+                              style: Theme.of(context).textTheme.bodySmall
+                                  ?.copyWith(color: AppColors.textSecondary),
                             ),
                           ],
                         ),
@@ -183,9 +176,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         ),
                         child: Text(
                           '45%',
-                          style: Theme.of(context)
-                              .textTheme
-                              .labelMedium
+                          style: Theme.of(context).textTheme.labelMedium
                               ?.copyWith(
                                 color: Colors.white,
                                 fontWeight: FontWeight.w700,
@@ -217,26 +208,17 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       _CompactStat(
                         icon: Icons.straight,
                         label: 'Distance',
-                        value:
-                            '${activeRoute.distance.toStringAsFixed(1)} km',
+                        value: '${activeRoute.distance.toStringAsFixed(1)} km',
                         context: context,
                       ),
-                      Container(
-                        width: 1,
-                        height: 30,
-                        color: AppColors.divider,
-                      ),
+                      Container(width: 1, height: 30, color: AppColors.divider),
                       _CompactStat(
                         icon: Icons.schedule,
                         label: 'Time',
                         value: '${activeRoute.duration} min',
                         context: context,
                       ),
-                      Container(
-                        width: 1,
-                        height: 30,
-                        color: AppColors.divider,
-                      ),
+                      Container(width: 1, height: 30, color: AppColors.divider),
                       _CompactStat(
                         icon: Icons.warning_amber,
                         label: 'Risk',
@@ -259,8 +241,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
             child: Container(
               decoration: const BoxDecoration(
                 color: AppColors.background,
-                borderRadius:
-                    BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadow,
@@ -292,17 +273,12 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       // Alerts section
                       if (nearbyAlerts.isNotEmpty) ...[
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               AppStrings.alertsNearby,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .titleMedium
-                                  ?.copyWith(
-                                    fontWeight: FontWeight.w700,
-                                  ),
+                              style: Theme.of(context).textTheme.titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w700),
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(
@@ -310,15 +286,14 @@ class _NavigationScreenState extends State<NavigationScreen> {
                                 vertical: 4,
                               ),
                               decoration: BoxDecoration(
-                                color: AppColors.alertRed
-                                    .withValues(alpha: 0.1),
+                                color: AppColors.alertRed.withValues(
+                                  alpha: 0.1,
+                                ),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
                                 '${nearbyAlerts.length}',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .labelSmall
+                                style: Theme.of(context).textTheme.labelSmall
                                     ?.copyWith(
                                       color: AppColors.alertRed,
                                       fontWeight: FontWeight.w700,
@@ -333,9 +308,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           final alert = entry.value;
                           return Padding(
                             padding: EdgeInsets.only(
-                              bottom: index < nearbyAlerts.length - 1
-                                  ? 12
-                                  : 16,
+                              bottom: index < nearbyAlerts.length - 1 ? 12 : 16,
                             ),
                             child: ActiveAlertCard(
                               alert: alert,
@@ -350,8 +323,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         children: [
                           Expanded(
                             child: OutlinedButton.icon(
-                              onPressed: () =>
-                                  _showAlertModal(activeAlert),
+                              onPressed: () => _showAlertModal(activeAlert),
                               icon: const Icon(Icons.warning_amber),
                               label: const Text('View Alert'),
                             ),
@@ -360,11 +332,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           Expanded(
                             child: ElevatedButton.icon(
                               onPressed: () {
-                                ScaffoldMessenger.of(context)
-                                    .showSnackBar(
+                                ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
-                                    content: Text(
-                                        'Keep pedaling safely!'),
+                                    content: Text('Keep pedaling safely!'),
                                     duration: Duration(seconds: 2),
                                   ),
                                 );
@@ -407,23 +377,16 @@ class _CompactStat extends StatelessWidget {
     return Expanded(
       child: Column(
         children: [
-          Icon(
-            icon,
-            size: 20,
-            color: color ?? AppColors.navigationCyan,
-          ),
+          Icon(icon, size: 20, color: color ?? AppColors.navigationCyan),
           const SizedBox(height: 6),
           Text(
             value,
-            style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 2),
-          Text(
-            label,
-            style: Theme.of(context).textTheme.labelSmall,
-          ),
+          Text(label, style: Theme.of(context).textTheme.labelSmall),
         ],
       ),
     );

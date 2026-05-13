@@ -11,7 +11,8 @@ class AppStrings {
   static const String riskLegend = 'Risk Level';
 
   // Route search screen
-  static const String routeSearchTitle = 'Find routes prioritizing bike infrastructure';
+  static const String routeSearchTitle =
+      'Find routes prioritizing bike infrastructure';
   static const String origin = 'Origin';
   static const String destination = 'Destination';
   static const String calculateRoute = 'Calculate route';

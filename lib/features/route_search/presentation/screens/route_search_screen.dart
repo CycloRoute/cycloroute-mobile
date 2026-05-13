@@ -126,7 +126,7 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
                     Wrap(
                       spacing: 10,
                       runSpacing: 10,
-                        children: const [
+                      children: const [
                         _PillBadge(label: 'Bike infrastructure'),
                         _PillBadge(label: 'Live risk scoring'),
                         _PillBadge(label: 'Bike-friendly streets'),
@@ -219,7 +219,8 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
                           tooltip: 'Swap origin and destination',
                           onPressed: () {
                             final temp = _originController.text;
-                            _originController.text = _destinationController.text;
+                            _originController.text =
+                                _destinationController.text;
                             _destinationController.text = temp;
                             setState(() {});
                           },
@@ -267,11 +268,13 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
                             children: [
                               _QuickLocationChip(
                                 location: 'Downtown Center',
-                                onTap: () => _applyQuickLocation('Downtown Center'),
+                                onTap: () =>
+                                    _applyQuickLocation('Downtown Center'),
                               ),
                               _QuickLocationChip(
                                 location: 'Central Park',
-                                onTap: () => _applyQuickLocation('Central Park'),
+                                onTap: () =>
+                                    _applyQuickLocation('Central Park'),
                               ),
                               _QuickLocationChip(
                                 location: 'City Harbor',
@@ -289,7 +292,9 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
                         label: AppStrings.calculateRoute,
                         onPressed: _canCalculate
                             ? () {
-                                Navigator.of(context).pushNamed('/route_results');
+                                Navigator.of(
+                                  context,
+                                ).pushNamed('/route_results');
                               }
                             : () {},
                       ),
@@ -331,9 +336,9 @@ class _PillBadge extends StatelessWidget {
       child: Text(
         label,
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w600,
-            ),
+          color: AppColors.textPrimary,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -376,9 +381,9 @@ class _QuickLocationChip extends StatelessWidget {
             const SizedBox(width: 10),
             Text(
               location,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    fontWeight: FontWeight.w600,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
             ),
           ],
         ),

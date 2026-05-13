@@ -12,8 +12,7 @@ class NavigationMapWidget extends StatelessWidget {
     Key? key,
     this.routeName = 'Active Route',
     this.currentLocation,
-  })
-    : super(key: key);
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

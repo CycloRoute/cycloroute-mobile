@@ -91,13 +91,28 @@ class _LoginScreenNewState extends State<LoginScreenNew> {
                     ],
                   ),
                   child: const Center(
-                    child: Icon(Icons.directions_bike, color: Colors.white, size: 52),
+                    child: Icon(
+                      Icons.directions_bike,
+                      color: Colors.white,
+                      size: 52,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 18),
-                Text('Welcome Back', style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: AppColors.textPrimary)),
+                Text(
+                  'Welcome Back',
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 6),
-                Text('Sign in to access your routes', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary)),
+                Text(
+                  'Sign in to access your routes',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
                 const SizedBox(height: 28),
                 // Inputs (no large card, simple premium fields)
                 if (_errorMessage != null)
@@ -109,9 +124,20 @@ class _LoginScreenNewState extends State<LoginScreenNew> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Icons.error_outline, color: AppColors.alertRed),
+                        const Icon(
+                          Icons.error_outline,
+                          color: AppColors.alertRed,
+                        ),
                         const SizedBox(width: 12),
-                        Expanded(child: Text(_errorMessage!, style: const TextStyle(color: AppColors.alertRed, fontSize: 13))),
+                        Expanded(
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(
+                              color: AppColors.alertRed,
+                              fontSize: 13,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -122,8 +148,14 @@ class _LoginScreenNewState extends State<LoginScreenNew> {
                     hintText: 'Email',
                     filled: true,
                     fillColor: AppColors.cardBackground,
-                    prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    prefixIcon: const Icon(
+                      Icons.email_outlined,
+                      color: AppColors.textSecondary,
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                   keyboardType: TextInputType.emailAddress,
                 ),
@@ -135,12 +167,24 @@ class _LoginScreenNewState extends State<LoginScreenNew> {
                     hintText: 'Password',
                     filled: true,
                     fillColor: AppColors.cardBackground,
-                    prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.textSecondary),
-                    suffixIcon: IconButton(
-                      icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppColors.textSecondary),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                    prefixIcon: const Icon(
+                      Icons.lock_outlined,
+                      color: AppColors.textSecondary,
                     ),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        color: AppColors.textSecondary,
+                      ),
+                      onPressed: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
+                    ),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                      borderSide: BorderSide.none,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -149,16 +193,48 @@ class _LoginScreenNewState extends State<LoginScreenNew> {
                   height: 52,
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _handleLogin,
-                    style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                    child: _isLoading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white))) : const Text('Sign In', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation(Colors.white),
+                            ),
+                          )
+                        : const Text(
+                            'Sign In',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text("Don't have an account? ", style: TextStyle(color: AppColors.textSecondary)),
-                    GestureDetector(onTap: () => Navigator.of(context).pushNamed('/register'), child: Text('Sign up', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700))),
+                    Text(
+                      "Don't have an account? ",
+                      style: TextStyle(color: AppColors.textSecondary),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pushNamed('/register'),
+                      child: Text(
+                        'Sign up',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),

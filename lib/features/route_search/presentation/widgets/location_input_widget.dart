@@ -30,9 +30,9 @@ class _LocationInputWidgetState extends State<LocationInputWidget> {
         Text(
           widget.label,
           style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: AppColors.textPrimary,
-              ),
+            fontWeight: FontWeight.w700,
+            color: AppColors.textPrimary,
+          ),
         ),
         const SizedBox(height: 8),
         Container(
@@ -58,14 +58,14 @@ class _LocationInputWidgetState extends State<LocationInputWidget> {
               setState(() {});
               widget.onChanged?.call(value);
             },
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.w600,
-                ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w600),
             decoration: InputDecoration(
               hintText: widget.hint,
               hintStyle: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary.withOpacity(0.7),
-                  ),
+                color: AppColors.textSecondary.withOpacity(0.7),
+              ),
               prefixIcon: Container(
                 margin: const EdgeInsets.all(10),
                 decoration: BoxDecoration(

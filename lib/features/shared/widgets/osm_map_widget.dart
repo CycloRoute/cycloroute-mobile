@@ -14,8 +14,8 @@ class OsmMapWidget extends StatefulWidget {
     this.zoom = 13,
     this.markers = const [],
     this.polylines = const [],
-  })  : center = center ?? LatLng(51.5074, -0.1278),
-        super(key: key);
+  }) : center = center ?? LatLng(51.5074, -0.1278),
+       super(key: key);
 
   @override
   State<OsmMapWidget> createState() => _OsmMapWidgetState();

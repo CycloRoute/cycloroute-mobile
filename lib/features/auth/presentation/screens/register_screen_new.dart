@@ -96,7 +96,10 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
               // Header banner
               Container(
                 width: double.infinity,
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 18,
+                ),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [AppColors.primaryLight, AppColors.primary],
@@ -121,15 +124,30 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
                         color: Colors.white.withOpacity(0.12),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.person_add, color: Colors.white, size: 28),
+                      child: const Icon(
+                        Icons.person_add,
+                        color: Colors.white,
+                        size: 28,
+                      ),
                     ),
                     const SizedBox(width: 14),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Create Account', style: Theme.of(context).textTheme.titleLarge?.copyWith(color: Colors.white, fontWeight: FontWeight.bold)),
+                        Text(
+                          'Create Account',
+                          style: Theme.of(context).textTheme.titleLarge
+                              ?.copyWith(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                        ),
                         const SizedBox(height: 4),
-                        Text('Get started with CycloRoute', style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.white70)),
+                        Text(
+                          'Get started with CycloRoute',
+                          style: Theme.of(context).textTheme.bodyMedium
+                              ?.copyWith(color: Colors.white70),
+                        ),
                       ],
                     ),
                   ],
@@ -161,9 +179,21 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.error_outline, color: AppColors.alertRed, size: 20),
+                            const Icon(
+                              Icons.error_outline,
+                              color: AppColors.alertRed,
+                              size: 20,
+                            ),
                             const SizedBox(width: 12),
-                            Expanded(child: Text(_errorMessage!, style: const TextStyle(color: AppColors.alertRed, fontSize: 13))),
+                            Expanded(
+                              child: Text(
+                                _errorMessage!,
+                                style: const TextStyle(
+                                  color: AppColors.alertRed,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ),
                           ],
                         ),
                       ),
@@ -174,8 +204,14 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
                         hintText: 'Email address',
                         filled: true,
                         fillColor: AppColors.background,
-                        prefixIcon: const Icon(Icons.email_outlined, color: AppColors.textSecondary),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                        prefixIcon: const Icon(
+                          Icons.email_outlined,
+                          color: AppColors.textSecondary,
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                       keyboardType: TextInputType.emailAddress,
                     ),
@@ -187,12 +223,25 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
                         hintText: 'Password',
                         filled: true,
                         fillColor: AppColors.background,
-                        prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.textSecondary),
-                        suffixIcon: IconButton(
-                          icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppColors.textSecondary),
-                          onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                        prefixIcon: const Icon(
+                          Icons.lock_outlined,
+                          color: AppColors.textSecondary,
                         ),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.textSecondary,
+                          ),
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -203,27 +252,50 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
                         hintText: 'Confirm password',
                         filled: true,
                         fillColor: AppColors.background,
-                        prefixIcon: const Icon(Icons.lock_outlined, color: AppColors.textSecondary),
-                        suffixIcon: IconButton(
-                          icon: Icon(_obscureConfirmPassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: AppColors.textSecondary),
-                          onPressed: () => setState(() => _obscureConfirmPassword = !_obscureConfirmPassword),
+                        prefixIcon: const Icon(
+                          Icons.lock_outlined,
+                          color: AppColors.textSecondary,
                         ),
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                        suffixIcon: IconButton(
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.textSecondary,
+                          ),
+                          onPressed: () => setState(
+                            () => _obscureConfirmPassword =
+                                !_obscureConfirmPassword,
+                          ),
+                        ),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     CheckboxListTile(
                       value: _agreedToTerms,
-                      onChanged: (value) => setState(() => _agreedToTerms = value ?? false),
+                      onChanged: (value) =>
+                          setState(() => _agreedToTerms = value ?? false),
                       title: RichText(
                         text: TextSpan(
                           text: 'I agree to the ',
-                          style: const TextStyle(color: AppColors.textSecondary, fontSize: 13),
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            fontSize: 13,
+                          ),
                           children: [
                             TextSpan(
                               text: 'Terms & Conditions',
-                              style: const TextStyle(color: AppColors.primary, fontWeight: FontWeight.w600),
-                              recognizer: TapGestureRecognizer()..onTap = () => Navigator.of(context).pushNamed('/terms'),
+                              style: const TextStyle(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () =>
+                                    Navigator.of(context).pushNamed('/terms'),
                             ),
                           ],
                         ),
@@ -236,16 +308,51 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
                       height: 52,
                       child: ElevatedButton(
                         onPressed: _isLoading ? null : _handleRegister,
-                        style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)), elevation: 6),
-                        child: _isLoading ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, valueColor: AlwaysStoppedAnimation(Colors.white))) : const Text('Create Account', style: TextStyle(fontSize: 16, fontWeight: FontWeight.w700)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 6,
+                        ),
+                        child: _isLoading
+                            ? const SizedBox(
+                                height: 20,
+                                width: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : const Text(
+                                'Create Account',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w700,
+                                ),
+                              ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text('Already have an account? ', style: TextStyle(color: AppColors.textSecondary)),
-                        GestureDetector(onTap: () => Navigator.of(context).pop(), child: Text('Sign in', style: TextStyle(color: AppColors.primary, fontWeight: FontWeight.w700))),
+                        Text(
+                          'Already have an account? ',
+                          style: TextStyle(color: AppColors.textSecondary),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Text(
+                            'Sign in',
+                            style: TextStyle(
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 8),

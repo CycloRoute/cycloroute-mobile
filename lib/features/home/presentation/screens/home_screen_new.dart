@@ -64,8 +64,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                   onTap: () {
                     context.read<AuthProvider>().logout();
                     Future.delayed(const Duration(milliseconds: 100), () {
-                      Navigator.of(context)
-                          .pushReplacementNamed('/login');
+                      Navigator.of(context).pushReplacementNamed('/login');
                     });
                   },
                 ),
@@ -86,25 +85,23 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                 builder: (context, authProvider, _) => Text(
                   'Welcome, ${authProvider.userEmail?.split('@').first ?? 'Cyclist'}!',
                   style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    color: AppColors.textPrimary,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
               Text(
                 'Your current location and route options',
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                  color: AppColors.textSecondary,
+                ),
               ),
               const SizedBox(height: 20),
               // OpenStreetMap widget - center on current location when available
               Consumer<LocationProvider>(
                 builder: (context, loc, _) {
-                  return OsmMapWidget(
-                    center: loc.currentLocation,
-                  );
+                  return OsmMapWidget(center: loc.currentLocation);
                 },
               ),
               const SizedBox(height: 24),
@@ -113,9 +110,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: AppColors.cardBackground,
-                  border: Border.all(
-                    color: AppColors.divider,
-                  ),
+                  border: Border.all(color: AppColors.divider),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: const RiskLegendWidget(),
@@ -157,9 +152,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                         Expanded(
                           child: Text(
                             'Plan your route',
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
+                            style: Theme.of(context).textTheme.titleMedium
                                 ?.copyWith(
                                   color: AppColors.textPrimary,
                                   fontWeight: FontWeight.w700,
@@ -179,10 +172,13 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                     const SizedBox(height: 12),
                     // Inline search field that looks native and premium
                     GestureDetector(
-                      onTap: () => Navigator.of(context).pushNamed('/route_search'),
+                      onTap: () =>
+                          Navigator.of(context).pushNamed('/route_search'),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 12),
+                          horizontal: 12,
+                          vertical: 12,
+                        ),
                         decoration: BoxDecoration(
                           color: AppColors.background,
                           borderRadius: BorderRadius.circular(12),
@@ -190,17 +186,22 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                         ),
                         child: Row(
                           children: [
-                            const Icon(Icons.search, color: AppColors.textSecondary),
+                            const Icon(
+                              Icons.search,
+                              color: AppColors.textSecondary,
+                            ),
                             const SizedBox(width: 10),
                             Expanded(
                               child: Text(
                                 AppStrings.searchSafeRoute,
-                                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                      color: AppColors.textSecondary,
-                                    ),
+                                style: Theme.of(context).textTheme.bodyMedium
+                                    ?.copyWith(color: AppColors.textSecondary),
                               ),
                             ),
-                            const Icon(Icons.chevron_right, color: AppColors.textSecondary),
+                            const Icon(
+                              Icons.chevron_right,
+                              color: AppColors.textSecondary,
+                            ),
                           ],
                         ),
                       ),
