@@ -110,7 +110,7 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
               const SizedBox(height: 24),
 
               // Route details
-              if (selectedRoute != null) ...[
+              ...[
                 Text(
                   'Route Details',
                   style: Theme.of(context).textTheme.titleMedium,

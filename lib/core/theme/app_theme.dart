@@ -88,6 +88,20 @@ class AppTheme {
     );
   }
 
+  static ThemeData get darkTheme {
+    return ThemeData(
+      useMaterial3: true,
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme.dark(
+        primary: AppColors.primaryLight,
+        secondary: AppColors.safeGreen,
+        surface: const Color(0xFF1F2937),
+        error: AppColors.alertRed,
+      ),
+      scaffoldBackgroundColor: const Color(0xFF111827),
+    );
+  }
+
   static const TextStyle _titleLarge = TextStyle(
     fontSize: 24,
     fontWeight: FontWeight.bold,

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:cyclerisk/core/constants/app_strings.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
+import 'package:cyclerisk/core/providers/location_provider.dart';
 import 'package:cyclerisk/data/mock/mock_alerts.dart';
 import 'package:cyclerisk/data/mock/mock_routes.dart' as routes;
 import 'package:cyclerisk/features/navigation/presentation/widgets/navigation_map_widget.dart';
@@ -25,6 +28,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
     activeRoute = routes.MockRoutes.getActiveRoute();
     activeAlert = MockAlerts.getActiveAlert();
     nearbyAlerts = MockAlerts.getNearbyAlerts();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<LocationProvider>().getCurrentLocation();
+    });
   }
 
   void _showAlertModal(RiskAlert alert) {
@@ -96,11 +104,19 @@ class _NavigationScreenState extends State<NavigationScreen> {
         children: [
           // Full-screen navigation map
           Positioned.fill(
-            child: SingleChildScrollView(
-              child: SizedBox(
-                height: screenHeight,
-                child: NavigationMapWidget(routeName: activeRoute.name),
-              ),
+            child: Consumer<LocationProvider>(
+              builder: (context, locationProvider, _) {
+                return SingleChildScrollView(
+                  child: SizedBox(
+                    height: screenHeight,
+                    child: NavigationMapWidget(
+                      routeName: activeRoute.name,
+                      currentLocation: locationProvider.currentLocation ??
+                          LatLng(37.4219983, -122.084),
+                    ),
+                  ),
+                );
+              },
             ),
           ),
 

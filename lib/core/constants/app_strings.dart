@@ -4,14 +4,14 @@ class AppStrings {
 
   // Home screen
   static const String homeTitle = 'CycleRisk';
-  static const String searchSafeRoute = 'Search safe route';
+  static const String searchSafeRoute = 'Search routes by infrastructure';
   static const String riskLow = 'Low';
   static const String riskMedium = 'Medium';
   static const String riskHigh = 'High';
   static const String riskLegend = 'Risk Level';
 
   // Route search screen
-  static const String routeSearchTitle = 'Find Safe Route';
+  static const String routeSearchTitle = 'Find routes prioritizing bike infrastructure';
   static const String origin = 'Origin';
   static const String destination = 'Destination';
   static const String calculateRoute = 'Calculate route';
@@ -19,8 +19,8 @@ class AppStrings {
   static const String destinationHint = 'Where to go';
 
   // Route results screen
-  static const String routeResultsTitle = 'Best Routes';
-  static const String safeRoute = 'Safest route';
+  static const String routeResultsTitle = 'Route Results';
+  static const String safeRoute = 'Best infrastructure route';
   static const String shortestRoute = 'Shortest route';
   static const String balancedRoute = 'Balanced route';
   static const String startRide = 'Start ride';

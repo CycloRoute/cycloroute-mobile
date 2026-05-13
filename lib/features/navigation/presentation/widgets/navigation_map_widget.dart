@@ -1,14 +1,34 @@
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
+import 'package:cyclerisk/features/shared/widgets/osm_map_widget.dart';
 
 class NavigationMapWidget extends StatelessWidget {
   final String routeName;
+  final LatLng? currentLocation;
 
-  const NavigationMapWidget({Key? key, this.routeName = 'Active Route'})
+  const NavigationMapWidget({
+    Key? key,
+    this.routeName = 'Active Route',
+    this.currentLocation,
+  })
     : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final center = currentLocation ?? LatLng(37.4219983, -122.084);
+    final destination = LatLng(
+      center.latitude + 0.008,
+      center.longitude + 0.010,
+    );
+    final routePoints = <LatLng>[
+      center,
+      LatLng(center.latitude + 0.003, center.longitude + 0.002),
+      LatLng(center.latitude + 0.006, center.longitude + 0.006),
+      destination,
+    ];
+
     return Container(
       width: double.infinity,
       height: 280,
@@ -19,14 +39,65 @@ class NavigationMapWidget extends StatelessWidget {
       ),
       child: Stack(
         children: [
-          // Simulated map with active route
           Positioned.fill(
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.cardBackground,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: CustomPaint(painter: _ActiveRoutePainter()),
+            child: OsmMapWidget(
+              center: center,
+              zoom: 14,
+              markers: [
+                Marker(
+                  width: 48,
+                  height: 48,
+                  point: center,
+                  builder: (_) => Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.navigationCyan,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadow,
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.directions_bike,
+                      color: Colors.white,
+                      size: 24,
+                    ),
+                  ),
+                ),
+                Marker(
+                  width: 42,
+                  height: 42,
+                  point: destination,
+                  builder: (_) => Container(
+                    decoration: BoxDecoration(
+                      color: AppColors.safeGreen,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.shadow,
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(
+                      Icons.flag,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ],
+              polylines: [
+                Polyline(
+                  points: routePoints,
+                  strokeWidth: 5,
+                  color: AppColors.safeGreen,
+                ),
+              ],
             ),
           ),
           // Route info overlay
@@ -75,130 +146,8 @@ class NavigationMapWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Current location indicator
-          Center(
-            child: Container(
-              width: 50,
-              height: 50,
-              decoration: BoxDecoration(
-                color: AppColors.navigationCyan,
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
-                    color: AppColors.shadow,
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
-              ),
-              child: const Icon(
-                Icons.directions_bike,
-                color: Colors.white,
-                size: 28,
-              ),
-            ),
-          ),
         ],
       ),
     );
-  }
-}
-
-class _ActiveRoutePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    // Background grid
-    final gridPaint = Paint()
-      ..color = AppColors.divider
-      ..strokeWidth = 0.5;
-
-    const gridSpacing = 40.0;
-    for (double x = 0; x < size.width; x += gridSpacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), gridPaint);
-    }
-    for (double y = 0; y < size.height; y += gridSpacing) {
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), gridPaint);
-    }
-
-    // Draw active route path (safe route in green)
-    final routePaint = Paint()
-      ..color = AppColors.safeGreen
-      ..strokeWidth = 4
-      ..style = PaintingStyle.stroke
-      ..strokeCap = StrokeCap.round
-      ..strokeJoin = StrokeJoin.round;
-
-    final path = Path()
-      ..moveTo(size.width * 0.1, size.height * 0.3)
-      ..quadraticBezierTo(
-        size.width * 0.2,
-        size.height * 0.2,
-        size.width * 0.35,
-        size.height * 0.25,
-      )
-      ..quadraticBezierTo(
-        size.width * 0.5,
-        size.height * 0.35,
-        size.width * 0.65,
-        size.height * 0.45,
-      )
-      ..quadraticBezierTo(
-        size.width * 0.8,
-        size.height * 0.55,
-        size.width * 0.9,
-        size.height * 0.75,
-      );
-
-    canvas.drawPath(path, routePaint);
-
-    // Draw destination marker
-    final destinationPaint = Paint()
-      ..color = AppColors.safeGreen
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.9, size.height * 0.75),
-      6,
-      destinationPaint,
-    );
-
-    // Draw destination ring
-    final destinationRingPaint = Paint()
-      ..color = AppColors.safeGreen.withOpacity(0.3)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.9, size.height * 0.75),
-      12,
-      destinationRingPaint,
-    );
-
-    // Draw some alert markers (high traffic area)
-    final alertPaint = Paint()
-      ..color = AppColors.alertRed
-      ..style = PaintingStyle.fill;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.5, size.height * 0.35),
-      4,
-      alertPaint,
-    );
-
-    final alertRingPaint = Paint()
-      ..color = AppColors.alertRed.withOpacity(0.2)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
-
-    canvas.drawCircle(
-      Offset(size.width * 0.5, size.height * 0.35),
-      10,
-      alertRingPaint,
-    );
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return false;
   }
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cyclerisk/core/constants/app_strings.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/shared/widgets/primary_button.dart';
-import 'package:cyclerisk/features/home/presentation/widgets/mock_map_widget.dart';
+import 'package:cyclerisk/features/shared/widgets/osm_map_widget.dart';
 import 'package:cyclerisk/features/home/presentation/widgets/risk_legend_widget.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -18,8 +18,8 @@ class HomeScreen extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Mock map
-              MockMapWidget(location: 'Downtown Center'),
+              // OpenStreetMap widget
+              OsmMapWidget(),
               const SizedBox(height: 24),
 
               // Risk legend
@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Get recommendations for the safest cycling routes considering real-time road risks.',
+                      'Get recommendations based on cycling infrastructure and real-time road risks.',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppColors.textSecondary,
                       ),
