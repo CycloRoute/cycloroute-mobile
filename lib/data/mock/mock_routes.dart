@@ -3,8 +3,8 @@ class Route {
   final String name;
   final double distance; // in km
   final int duration; // in minutes
-  final String riskLevel; // 'low', 'medium', 'high'
-  final double riskScore; // 0-100
+  final String riskLevel; // kept for color/fit mapping
+  final double riskScore; // kept as an internal fit score
   final List<String> waypoints;
 
   Route({
@@ -23,22 +23,22 @@ class MockRoutes {
     return [
       Route(
         id: 'route_1',
-        name: 'Safest route',
+        name: 'Protected lane route',
         distance: 8.5,
         duration: 28,
         riskLevel: 'low',
         riskScore: 15.0,
         waypoints: [
           'Downtown Center',
-          'Park Avenue',
-          'Bike Lane North',
-          'Safe Street',
-          'Destination Point',
+          'Park Avenue protected lane',
+          'North bike corridor',
+          'Quiet block connection',
+          'Destination',
         ],
       ),
       Route(
         id: 'route_2',
-        name: 'Shortest route',
+        name: 'Fastest corridor',
         distance: 5.2,
         duration: 18,
         riskLevel: 'medium',
@@ -46,24 +46,24 @@ class MockRoutes {
         waypoints: [
           'Downtown Center',
           'Main Street',
-          'Intersection Road',
-          'Direct Path',
-          'Destination Point',
+          'Signalized crossing',
+          'Direct corridor',
+          'Destination',
         ],
       ),
       Route(
         id: 'route_3',
-        name: 'Balanced route',
+        name: 'Balanced bike route',
         distance: 6.8,
         duration: 23,
         riskLevel: 'medium',
         riskScore: 38.0,
         waypoints: [
           'Downtown Center',
-          'Commercial District',
-          'Mid-level Lane',
-          'Strategic Route',
-          'Destination Point',
+          'Commercial district',
+          'Mixed-use avenue',
+          'Buffered lane segment',
+          'Destination',
         ],
       ),
     ];

@@ -3,12 +3,19 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthProvider extends ChangeNotifier {
   bool _isLoggedIn = false;
+  String? _fullName;
   String? _userEmail;
+  String? _phoneNumber;
   bool _agreedToTerms = false;
 
   bool get isLoggedIn => _isLoggedIn;
+  String? get fullName => _fullName;
   String? get userEmail => _userEmail;
+  String? get phoneNumber => _phoneNumber;
   bool get agreedToTerms => _agreedToTerms;
+  String get displayName => _fullName?.trim().isNotEmpty == true
+      ? _fullName!.trim()
+      : (_userEmail?.split('@').first ?? 'Cyclist');
 
   AuthProvider() {
     _loadAuthState();
@@ -17,7 +24,9 @@ class AuthProvider extends ChangeNotifier {
   Future<void> _loadAuthState() async {
     final prefs = await SharedPreferences.getInstance();
     _isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+    _fullName = prefs.getString('fullName');
     _userEmail = prefs.getString('userEmail');
+    _phoneNumber = prefs.getString('phoneNumber');
     _agreedToTerms = prefs.getBool('agreedToTerms') ?? false;
     notifyListeners();
   }
@@ -41,15 +50,27 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> register(String email, String password) async {
+  Future<bool> register({
+    required String fullName,
+    required String email,
+    required String phoneNumber,
+    required String password,
+  }) async {
     try {
       // Simulate registration (in real app, call backend API)
-      if (email.isNotEmpty && password.length >= 6) {
+      if (fullName.isNotEmpty &&
+          email.isNotEmpty &&
+          phoneNumber.isNotEmpty &&
+          password.length >= 6) {
         final prefs = await SharedPreferences.getInstance();
         await prefs.setBool('isLoggedIn', true);
+        await prefs.setString('fullName', fullName);
         await prefs.setString('userEmail', email);
+        await prefs.setString('phoneNumber', phoneNumber);
         _isLoggedIn = true;
+        _fullName = fullName;
         _userEmail = email;
+        _phoneNumber = phoneNumber;
         notifyListeners();
         return true;
       }
@@ -71,7 +92,9 @@ class AuthProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
     _isLoggedIn = false;
+    _fullName = null;
     _userEmail = null;
+    _phoneNumber = null;
     _agreedToTerms = false;
     notifyListeners();
   }

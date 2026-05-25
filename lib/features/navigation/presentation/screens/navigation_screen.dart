@@ -21,6 +21,8 @@ class _NavigationScreenState extends State<NavigationScreen> {
   late routes.Route activeRoute;
   late RiskAlert activeAlert;
   late List<RiskAlert> nearbyAlerts;
+  String? destination;
+  bool _routeInfoLoaded = false;
 
   @override
   void initState() {
@@ -33,6 +35,31 @@ class _NavigationScreenState extends State<NavigationScreen> {
       if (!mounted) return;
       context.read<LocationProvider>().getCurrentLocation();
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_routeInfoLoaded) {
+      return;
+    }
+
+    final arguments = ModalRoute.of(context)?.settings.arguments;
+    if (arguments is Map) {
+      final route = arguments['route'];
+      final routeDestination = arguments['destination'];
+
+      if (route is routes.Route) {
+        activeRoute = route;
+      }
+
+      if (routeDestination is String && routeDestination.trim().isNotEmpty) {
+        destination = routeDestination;
+      }
+    }
+
+    _routeInfoLoaded = true;
   }
 
   void _showAlertModal(RiskAlert alert) {
@@ -65,7 +92,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text(AppStrings.navigationTitle),
+        title: Text(
+          destination == null
+              ? AppStrings.navigationTitle
+              : 'Navigating to $destination',
+        ),
         elevation: 0,
         actions: [
           IconButton(
@@ -110,7 +141,9 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   child: SizedBox(
                     height: screenHeight,
                     child: NavigationMapWidget(
-                      routeName: activeRoute.name,
+                      routeName: destination == null
+                          ? activeRoute.name
+                          : '${activeRoute.name} to $destination',
                       currentLocation:
                           locationProvider.currentLocation ??
                           LatLng(37.4219983, -122.084),
@@ -152,13 +185,17 @@ class _NavigationScreenState extends State<NavigationScreen> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              activeRoute.name,
+                              destination == null
+                                  ? activeRoute.name
+                                  : '$destination via ${activeRoute.name}',
                               style: Theme.of(context).textTheme.titleMedium
                                   ?.copyWith(fontWeight: FontWeight.w700),
                             ),
                             const SizedBox(height: 4),
                             Text(
-                              '45% of route completed',
+                              destination == null
+                                  ? '45% of route completed'
+                                  : 'Heading to $destination',
                               style: Theme.of(context).textTheme.bodySmall
                                   ?.copyWith(color: AppColors.textSecondary),
                             ),

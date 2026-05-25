@@ -4,9 +4,7 @@ import 'package:cyclerisk/core/providers/location_provider.dart';
 import 'package:cyclerisk/core/constants/app_strings.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/core/providers/auth_provider.dart';
-import 'package:cyclerisk/shared/widgets/primary_button.dart';
 import 'package:cyclerisk/features/shared/widgets/osm_map_widget.dart';
-import 'package:cyclerisk/features/home/presentation/widgets/risk_legend_widget.dart';
 
 class HomeScreenNew extends StatefulWidget {
   const HomeScreenNew({Key? key}) : super(key: key);
@@ -16,6 +14,28 @@ class HomeScreenNew extends StatefulWidget {
 }
 
 class _HomeScreenNewState extends State<HomeScreenNew> {
+  final List<_NearbyAlert> _nearbyAlerts = const [
+    _NearbyAlert(
+      title: 'Road works on Maple Avenue',
+      subtitle: 'Expect slower traffic and a narrow lane for the next 2 days.',
+      distance: '0.4 km away',
+      icon: Icons.construction_rounded,
+    ),
+    _NearbyAlert(
+      title: 'Community bike ride tonight',
+      subtitle: 'Short group ride passing through the north side at 7:30 PM.',
+      distance: '1.1 km away',
+      icon: Icons.groups_rounded,
+    ),
+    _NearbyAlert(
+      title: 'Temporary lane closure',
+      subtitle:
+          'One block near the riverfront is partially closed this morning.',
+      distance: '1.8 km away',
+      icon: Icons.warning_amber_rounded,
+    ),
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -32,6 +52,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
         title: const Text(AppStrings.appName),
         elevation: 0,
         backgroundColor: AppColors.background,
+        surfaceTintColor: Colors.transparent,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16),
@@ -64,7 +85,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                   onTap: () {
                     context.read<AuthProvider>().logout();
                     Future.delayed(const Duration(milliseconds: 100), () {
-                      Navigator.of(context).pushReplacementNamed('/login');
+                      Navigator.of(context).pushReplacementNamed('/auth-entry');
                     });
                   },
                 ),
@@ -75,127 +96,92 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
         ],
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome message
-              Consumer<AuthProvider>(
-                builder: (context, authProvider, _) => Text(
-                  'Welcome, ${authProvider.userEmail?.split('@').first ?? 'Cyclist'}!',
-                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    color: AppColors.textPrimary,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'Your current location and route options',
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 20),
-              // OpenStreetMap widget - center on current location when available
-              Consumer<LocationProvider>(
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: Consumer<LocationProvider>(
                 builder: (context, loc, _) {
                   return OsmMapWidget(center: loc.currentLocation);
                 },
               ),
-              const SizedBox(height: 24),
-              // Risk legend
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.cardBackground,
-                  border: Border.all(color: AppColors.divider),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: const RiskLegendWidget(),
-              ),
-              const SizedBox(height: 24),
-              // Premium search card (compact)
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.cardBackground,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppColors.shadow.withOpacity(0.06),
-                      blurRadius: 16,
-                      offset: const Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: Column(
+            ),
+            Positioned(
+              top: 12,
+              left: 16,
+              right: 16,
+              child: Consumer<AuthProvider>(
+                builder: (context, authProvider, _) => Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: AppColors.primary,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(
-                            Icons.directions_bike,
-                            color: Colors.white,
-                            size: 22,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Text(
-                            'Plan your route',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(
-                                  color: AppColors.textPrimary,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                          ),
-                        ),
-                        // Optional small action
-                        IconButton(
-                          icon: const Icon(Icons.history_edu_outlined),
-                          color: AppColors.textSecondary,
-                          onPressed: () {
-                            // Placeholder for actions like recent routes
-                          },
-                        ),
-                      ],
+                    Text(
+                      'Welcome, ${authProvider.displayName}',
+                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                        color: AppColors.textPrimary,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: -0.4,
+                      ),
                     ),
                     const SizedBox(height: 12),
-                    // Inline search field that looks native and premium
                     GestureDetector(
                       onTap: () =>
                           Navigator.of(context).pushNamed('/route_search'),
                       child: Container(
+                        width: double.infinity,
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 12,
+                          horizontal: 16,
+                          vertical: 14,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.background,
-                          borderRadius: BorderRadius.circular(12),
+                          color: Colors.white.withOpacity(0.78),
+                          borderRadius: BorderRadius.circular(20),
                           border: Border.all(color: AppColors.divider),
+                          boxShadow: [
+                            BoxShadow(
+                              color: AppColors.shadow.withOpacity(0.10),
+                              blurRadius: 18,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
                         ),
                         child: Row(
                           children: [
-                            const Icon(
-                              Icons.search,
-                              color: AppColors.textSecondary,
+                            Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: AppColors.primary.withOpacity(0.10),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: const Icon(
+                                Icons.search,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(width: 12),
                             Expanded(
-                              child: Text(
-                                AppStrings.searchSafeRoute,
-                                style: Theme.of(context).textTheme.bodyMedium
-                                    ?.copyWith(color: AppColors.textSecondary),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'Where to?',
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .titleSmall
+                                        ?.copyWith(
+                                          color: AppColors.textPrimary,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Search recent places or enter a destination',
+                                    style: Theme.of(context).textTheme.bodySmall
+                                        ?.copyWith(
+                                          color: AppColors.textSecondary,
+                                        ),
+                                  ),
+                                ],
                               ),
                             ),
                             const Icon(
@@ -209,22 +195,159 @@ class _HomeScreenNewState extends State<HomeScreenNew> {
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-              // Search button
-              SizedBox(
-                width: double.infinity,
-                child: PrimaryButton(
-                  label: AppStrings.searchSafeRoute,
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/route_search');
-                  },
+            ),
+            Positioned(
+              left: 12,
+              right: 12,
+              bottom: 12,
+              child: Container(
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.82),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: AppColors.divider),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.shadow.withOpacity(0.12),
+                      blurRadius: 18,
+                      offset: const Offset(0, -2),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          'Nearby alerts',
+                          style: Theme.of(context).textTheme.titleSmall
+                              ?.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          'Around you',
+                          style: Theme.of(context).textTheme.labelSmall
+                              ?.copyWith(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    SizedBox(
+                      height: 126,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: _nearbyAlerts.length,
+                        separatorBuilder: (_, __) => const SizedBox(width: 10),
+                        itemBuilder: (context, index) {
+                          final alert = _nearbyAlerts[index];
+                          return SizedBox(
+                            width: 240,
+                            child: Container(
+                              padding: const EdgeInsets.all(14),
+                              decoration: BoxDecoration(
+                                color: AppColors.background,
+                                borderRadius: BorderRadius.circular(18),
+                                border: Border.all(color: AppColors.divider),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    width: 40,
+                                    height: 40,
+                                    decoration: BoxDecoration(
+                                      color: AppColors.primary.withOpacity(
+                                        0.10,
+                                      ),
+                                      borderRadius: BorderRadius.circular(14),
+                                    ),
+                                    child: Icon(
+                                      alert.icon,
+                                      color: AppColors.primary,
+                                      size: 20,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          alert.title,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .titleSmall
+                                              ?.copyWith(
+                                                color: AppColors.textPrimary,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                        const SizedBox(height: 4),
+                                        Text(
+                                          alert.subtitle,
+                                          maxLines: 3,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .bodySmall
+                                              ?.copyWith(
+                                                color: AppColors.textSecondary,
+                                                height: 1.3,
+                                              ),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          alert.distance,
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelSmall
+                                              ?.copyWith(
+                                                color: AppColors.textSecondary,
+                                                fontWeight: FontWeight.w600,
+                                              ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
+}
+
+class _NearbyAlert {
+  const _NearbyAlert({
+    required this.title,
+    required this.subtitle,
+    required this.distance,
+    required this.icon,
+  });
+
+  final String title;
+  final String subtitle;
+  final String distance;
+  final IconData icon;
 }

@@ -1,190 +1,201 @@
 import 'package:flutter/material.dart';
-import 'package:cyclerisk/core/constants/app_strings.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/data/mock/mock_routes.dart' as route_data;
-import 'package:cyclerisk/shared/widgets/primary_button.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_option_card.dart';
 
 class RouteResultsScreen extends StatefulWidget {
-  const RouteResultsScreen({Key? key}) : super(key: key);
+  const RouteResultsScreen({super.key});
 
   @override
   State<RouteResultsScreen> createState() => _RouteResultsScreenState();
 }
 
 class _RouteResultsScreenState extends State<RouteResultsScreen> {
-  late List<route_data.Route> routes;
+  late final List<route_data.Route> routes;
   late route_data.Route selectedRoute;
+  String? destination;
 
   @override
   void initState() {
     super.initState();
     routes = route_data.MockRoutes.getSampleRoutes();
-    selectedRoute = routes[0];
+    selectedRoute = routes.first;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    destination ??= ModalRoute.of(context)?.settings.arguments as String?;
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: const Text(AppStrings.routeResultsTitle),
+        title: const Text('Route options'),
         elevation: 0,
+        backgroundColor: Colors.transparent,
+        foregroundColor: AppColors.textPrimary,
+        scrolledUnderElevation: 0,
       ),
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Info section
+              Text(
+                destination == null
+                    ? 'Choose your route'
+                    : 'Routes to $destination',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.textPrimary,
+                  height: 1.05,
+                ),
+              ).animate().fadeIn(duration: 360.ms).slideY(begin: 0.04, end: 0),
+              const SizedBox(height: 6),
+              Text(
+                'Pick the route that feels right: faster, calmer, or more protected.',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                  height: 1.35,
+                ),
+              ).animate().fadeIn(delay: 80.ms, duration: 320.ms),
+              const SizedBox(height: 18),
+              Text(
+                    'Route options',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.textPrimary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(delay: 100.ms, duration: 360.ms)
+                  .slideX(begin: -0.03, end: 0),
+              const SizedBox(height: 6),
+              Text(
+                'Tap a route to paint its path and details.',
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+              ).animate().fadeIn(delay: 160.ms, duration: 320.ms),
+              const SizedBox(height: 12),
+              Container(
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.74),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.divider),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Column(
+                    children: routes.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final route = entry.value;
+
+                      return Column(
+                        children: [
+                          RouteOptionCard(
+                                route: route,
+                                isSelected: selectedRoute.id == route.id,
+                                onSelect: () =>
+                                    setState(() => selectedRoute = route),
+                              )
+                              .animate()
+                              .fadeIn(delay: (70 * index).ms, duration: 320.ms)
+                              .slideX(begin: 0.03, end: 0),
+                          if (index < routes.length - 1)
+                            Divider(
+                              height: 1,
+                              thickness: 1,
+                              color: AppColors.divider.withOpacity(0.7),
+                            ),
+                        ],
+                      );
+                    }).toList(),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 18),
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: AppColors.safeGreen.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
-                  border: Border.all(
-                    color: AppColors.safeGreen.withOpacity(0.3),
-                  ),
+                  color: Colors.white.withOpacity(0.76),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: AppColors.divider),
                 ),
-                child: Row(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: AppColors.safeGreen,
-                        shape: BoxShape.circle,
+                    Row(
+                      children: [
+                        Text(
+                          'Selected route',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(
+                                color: AppColors.textPrimary,
+                                fontWeight: FontWeight.w700,
+                              ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${selectedRoute.distance.toStringAsFixed(1)} km',
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(
+                                color: AppColors.textSecondary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                        ),
+                      ],
+                    ).animate().fadeIn(duration: 360.ms),
+                    const SizedBox(height: 12),
+                    Text(
+                      selectedRoute.waypoints.join(' · '),
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.textPrimary,
+                        height: 1.45,
                       ),
-                      child: const Icon(
-                        Icons.check_circle,
-                        color: Colors.white,
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Routes calculated!',
-                            style: Theme.of(context).textTheme.titleMedium
-                                ?.copyWith(fontWeight: FontWeight.w700),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            'Choose the route that best fits your needs.',
-                            style: Theme.of(context).textTheme.bodySmall,
-                          ),
-                        ],
-                      ),
-                    ),
+                    ).animate().fadeIn(delay: 80.ms, duration: 300.ms),
                   ],
                 ),
               ),
-              const SizedBox(height: 24),
-
-              // Route options
-              Text(
-                'Available routes',
-                style: Theme.of(context).textTheme.titleMedium,
-              ),
-              const SizedBox(height: 12),
-              ...routes.asMap().entries.map((entry) {
-                final index = entry.key;
-                final route = entry.value;
-                return Padding(
-                  padding: EdgeInsets.only(
-                    bottom: index < routes.length - 1 ? 12 : 0,
-                  ),
-                  child: RouteOptionCard(
-                    route: route,
-                    isSelected: selectedRoute.id == route.id,
-                    onSelect: () {
-                      setState(() {
-                        selectedRoute = route;
-                      });
-                    },
-                  ),
-                );
-              }).toList(),
-              const SizedBox(height: 24),
-
-              // Route details
-              ...[
-                Text(
-                  'Route Details',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 12),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.cardBackground,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Waypoints',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          fontWeight: FontWeight.w600,
+              const SizedBox(height: 18),
+              SizedBox(
+                    width: double.infinity,
+                    height: 54,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pushNamed(
+                          '/navigation',
+                          arguments: {
+                            'route': selectedRoute,
+                            'destination': destination,
+                          },
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
                         ),
                       ),
-                      const SizedBox(height: 8),
-                      ...selectedRoute.waypoints.asMap().entries.map((entry) {
-                        final index = entry.key;
-                        final waypoint = entry.value;
-                        return Padding(
-                          padding: EdgeInsets.only(
-                            bottom: index < selectedRoute.waypoints.length - 1
-                                ? 8
-                                : 0,
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 24,
-                                height: 24,
-                                decoration: BoxDecoration(
-                                  color: AppColors.navigationCyan,
-                                  shape: BoxShape.circle,
-                                ),
-                                alignment: Alignment.center,
-                                child: Text(
-                                  '${index + 1}',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: Text(
-                                  waypoint,
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ),
-                            ],
-                          ),
-                        );
-                      }).toList(),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
-              ],
-
-              // Start ride button
-              PrimaryButton(
-                label: AppStrings.startRide,
-                onPressed: () {
-                  Navigator.of(context).pushNamed('/navigation');
-                },
-              ),
-              const SizedBox(height: 16),
+                      child: const Text(
+                        'Start navigation',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(delay: 220.ms, duration: 360.ms)
+                  .slideY(begin: 0.08, end: 0),
             ],
           ),
         ),

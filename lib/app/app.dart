@@ -43,7 +43,7 @@ class _LoadingHomeState extends State<_LoadingHome> {
       if (authProvider.isLoggedIn) {
         Navigator.of(context).pushReplacementNamed(AppRoutes.home);
       } else {
-        Navigator.of(context).pushReplacementNamed(AppRoutes.login);
+        Navigator.of(context).pushReplacementNamed(AppRoutes.authEntry);
       }
     });
   }
