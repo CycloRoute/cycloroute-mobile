@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cyclerisk/core/constants/app_strings.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
-import 'package:cyclerisk/data/mock/mock_alerts.dart';
+import 'package:cyclerisk/features/risk_alert/data/models/risk_alert.dart';
 import 'package:cyclerisk/shared/widgets/primary_button.dart';
 
 class RiskAlertModal extends StatelessWidget {

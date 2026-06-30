@@ -2,8 +2,13 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cyclerisk/app/routes.dart';
+import 'package:cyclerisk/core/l10n/localize_api_error.dart';
+import 'package:cyclerisk/core/l10n/l10n.dart';
+import 'package:cyclerisk/core/navigation/auth_navigation.dart';
 import 'package:cyclerisk/core/providers/auth_provider.dart';
+import 'package:cyclerisk/core/providers/location_provider.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
+import 'package:cyclerisk/features/auth/presentation/widgets/auth_flow_widgets.dart';
 
 class RegisterScreenNew extends StatefulWidget {
   const RegisterScreenNew({super.key});
@@ -48,13 +53,13 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
   }
 
   Future<void> _handleRegister() async {
+    final l10n = appL10n(context);
     final firstName = _firstNameController.text.trim();
     final lastName = _lastNameController.text.trim();
     final email = _emailController.text.trim();
     final phoneNumber = _phoneController.text.trim();
     final password = _passwordController.text;
     final confirmPassword = _confirmPasswordController.text;
-    final fullName = '$firstName $lastName'.trim();
 
     if (firstName.isEmpty ||
         lastName.isEmpty ||
@@ -62,19 +67,17 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
         phoneNumber.isEmpty ||
         password.isEmpty ||
         confirmPassword.isEmpty) {
-      setState(() => _errorMessage = 'Please fill in all fields');
+      setState(() => _errorMessage = l10n.fillAllFields);
       return;
     }
 
     if (password != confirmPassword) {
-      setState(() => _errorMessage = 'Passwords do not match');
+      setState(() => _errorMessage = l10n.passwordsDoNotMatch);
       return;
     }
 
     if (!_agreedToTerms) {
-      setState(
-        () => _errorMessage = 'You must agree to the terms and conditions',
-      );
+      setState(() => _errorMessage = l10n.agreeToTerms);
       return;
     }
 
@@ -84,10 +87,12 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
     });
 
     final success = await context.read<AuthProvider>().register(
-      fullName: fullName,
+      firstnames: firstName,
+      lastnames: lastName,
       email: email,
       phoneNumber: phoneNumber,
       password: password,
+      confirmPassword: confirmPassword,
     );
 
     if (!mounted) return;
@@ -95,284 +100,184 @@ class _RegisterScreenNewState extends State<RegisterScreenNew> {
     setState(() => _isLoading = false);
 
     if (success) {
-      Navigator.of(context).pushReplacementNamed(AppRoutes.home);
+      await context
+          .read<LocationProvider>()
+          .requestInitialAccessIfNeeded(context);
+
+      if (!mounted) return;
+
+      await navigateAfterAuth(context);
       return;
     }
 
-    setState(() => _errorMessage = 'Registration failed. Please try again.');
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String hintText,
-    required IconData icon,
-    TextInputType keyboardType = TextInputType.text,
-    bool obscureText = false,
-    Widget? suffixIcon,
-  }) {
-    return TextField(
-      controller: controller,
-      keyboardType: keyboardType,
-      obscureText: obscureText,
-      style: const TextStyle(fontWeight: FontWeight.w600),
-      decoration: InputDecoration(
-        hintText: hintText,
-        filled: true,
-        fillColor: Colors.white,
-        prefixIcon: Icon(icon, color: AppColors.textSecondary),
-        suffixIcon: suffixIcon,
-        hintStyle: const TextStyle(color: AppColors.textTertiary),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 18,
-        ),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.divider),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.divider),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: AppColors.primary, width: 1.3),
-        ),
-      ),
+    final providerError = context.read<AuthProvider>().lastApiError;
+    setState(
+      () => _errorMessage =
+          localizeAuthError(l10n, providerError) ?? l10n.registrationFailed,
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Color(0xFFF7FAFF), Color(0xFFEAF3FF), Color(0xFFF9FBFF)],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: IconButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        icon: const Icon(Icons.arrow_back_rounded),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Create account',
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.8,
-                        color: AppColors.textPrimary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Add your details to get started.',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: AppColors.textSecondary,
-                        height: 1.4,
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    if (_errorMessage != null)
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: AppColors.alertRed.withOpacity(0.08),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: AppColors.alertRed.withOpacity(0.14),
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(
-                              Icons.error_outline,
-                              color: AppColors.alertRed,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                _errorMessage!,
-                                style: const TextStyle(
-                                  color: AppColors.alertRed,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    if (_errorMessage != null) const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _firstNameController,
-                            hintText: 'First names',
-                            icon: Icons.badge_outlined,
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: _buildTextField(
-                            controller: _lastNameController,
-                            hintText: 'Last names',
-                            icon: Icons.badge_outlined,
-                          ),
-                        ),
+    final l10n = appL10n(context);
+
+    return AuthGradientScaffold(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 18),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 520),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                AuthBackButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                const SizedBox(height: 16),
+                AuthPageHeader(
+                  icon: Icons.person_add_alt_1_rounded,
+                  title: l10n.registerTitle,
+                  subtitle: l10n.registerSubtitle,
+                ),
+                const SizedBox(height: 22),
+                AuthFormCard(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      if (_errorMessage != null) ...[
+                        AuthErrorBanner(message: _errorMessage!),
+                        const SizedBox(height: 14),
                       ],
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      controller: _emailController,
-                      hintText: 'Email address',
-                      icon: Icons.email_outlined,
-                      keyboardType: TextInputType.emailAddress,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      controller: _phoneController,
-                      hintText: 'Phone number',
-                      icon: Icons.phone_outlined,
-                      keyboardType: TextInputType.phone,
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      controller: _passwordController,
-                      hintText: 'Password',
-                      icon: Icons.lock_outline_rounded,
-                      obscureText: _obscurePassword,
-                      suffixIcon: IconButton(
-                        onPressed: () => setState(
-                          () => _obscurePassword = !_obscurePassword,
-                        ),
-                        icon: Icon(
-                          _obscurePassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    _buildTextField(
-                      controller: _confirmPasswordController,
-                      hintText: 'Confirm password',
-                      icon: Icons.lock_outline_rounded,
-                      obscureText: _obscureConfirmPassword,
-                      suffixIcon: IconButton(
-                        onPressed: () => setState(
-                          () => _obscureConfirmPassword =
-                              !_obscureConfirmPassword,
-                        ),
-                        icon: Icon(
-                          _obscureConfirmPassword
-                              ? Icons.visibility_off_outlined
-                              : Icons.visibility_outlined,
-                          color: AppColors.textSecondary,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    CheckboxListTile(
-                      value: _agreedToTerms,
-                      onChanged: (value) =>
-                          setState(() => _agreedToTerms = value ?? false),
-                      contentPadding: EdgeInsets.zero,
-                      controlAffinity: ListTileControlAffinity.leading,
-                      title: RichText(
-                        text: TextSpan(
-                          text: 'I agree to the ',
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 13,
-                          ),
-                          children: [
-                            TextSpan(
-                              text: 'Terms & Conditions',
-                              style: const TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () => Navigator.of(
-                                  context,
-                                ).pushNamed(AppRoutes.terms),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: AuthTextField(
+                              controller: _firstNameController,
+                              hintText: l10n.firstNames,
+                              icon: Icons.badge_outlined,
                             ),
-                          ],
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: AuthTextField(
+                              controller: _lastNameController,
+                              hintText: l10n.lastNames,
+                              icon: Icons.badge_outlined,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      AuthTextField(
+                        controller: _emailController,
+                        hintText: l10n.emailAddress,
+                        icon: Icons.email_outlined,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
+                      const SizedBox(height: 12),
+                      AuthTextField(
+                        controller: _phoneController,
+                        hintText: l10n.phoneNumber,
+                        icon: Icons.phone_outlined,
+                        keyboardType: TextInputType.phone,
+                      ),
+                      const SizedBox(height: 12),
+                      AuthTextField(
+                        controller: _passwordController,
+                        hintText: l10n.password,
+                        icon: Icons.lock_outline_rounded,
+                        obscureText: _obscurePassword,
+                        suffixIcon: IconButton(
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
+                          icon: Icon(
+                            _obscurePassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    SizedBox(
-                      width: double.infinity,
-                      height: 54,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _handleRegister,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                      const SizedBox(height: 12),
+                      AuthTextField(
+                        controller: _confirmPasswordController,
+                        hintText: l10n.confirmPassword,
+                        icon: Icons.lock_outline_rounded,
+                        obscureText: _obscureConfirmPassword,
+                        suffixIcon: IconButton(
+                          onPressed: () => setState(
+                            () => _obscureConfirmPassword =
+                                !_obscureConfirmPassword,
                           ),
-                          elevation: 4,
+                          icon: Icon(
+                            _obscureConfirmPassword
+                                ? Icons.visibility_off_outlined
+                                : Icons.visibility_outlined,
+                            color: AppColors.textSecondary,
+                          ),
                         ),
-                        child: _isLoading
-                            ? const SizedBox(
-                                height: 20,
-                                width: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation(
-                                    Colors.white,
-                                  ),
-                                ),
-                              )
-                            : const Text(
-                                'Create account',
-                                style: TextStyle(
-                                  fontSize: 16,
+                      ),
+                      const SizedBox(height: 6),
+                      CheckboxListTile(
+                        value: _agreedToTerms,
+                        onChanged: (value) =>
+                            setState(() => _agreedToTerms = value ?? false),
+                        contentPadding: EdgeInsets.zero,
+                        controlAffinity: ListTileControlAffinity.leading,
+                        title: RichText(
+                          text: TextSpan(
+                            text: l10n.agreeToTermsPrefix,
+                            style: const TextStyle(
+                              color: AppColors.textSecondary,
+                              fontSize: 13,
+                            ),
+                            children: [
+                              TextSpan(
+                                text: l10n.termsAndConditions,
+                                style: const TextStyle(
+                                  color: AppColors.primary,
                                   fontWeight: FontWeight.w700,
                                 ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () => Navigator.of(
+                                    context,
+                                  ).pushNamed(AppRoutes.terms),
                               ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Already have an account? ',
-                          style: TextStyle(color: AppColors.textSecondary),
-                        ),
-                        GestureDetector(
-                          onTap: () => Navigator.of(context).pop(),
-                          child: const Text(
-                            'Sign in',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontWeight: FontWeight.w800,
-                            ),
+                            ],
                           ),
                         ),
-                      ],
+                      ),
+                      const SizedBox(height: 8),
+                      AuthPrimaryButton(
+                        label: l10n.registerTitle,
+                        isLoading: _isLoading,
+                        onPressed: _isLoading ? null : _handleRegister,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      l10n.alreadyHaveAccountPrompt,
+                      style: const TextStyle(color: AppColors.textSecondary),
+                    ),
+                    GestureDetector(
+                      onTap: () => Navigator.of(context).pop(),
+                      child: Text(
+                        l10n.signIn,
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
                     ),
                   ],
                 ),
-              ),
+              ],
             ),
           ),
         ),

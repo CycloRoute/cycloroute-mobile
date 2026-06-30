@@ -1,101 +1,119 @@
 import 'package:flutter/material.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
-import 'package:cyclerisk/data/mock/mock_alerts.dart';
+import 'package:cyclerisk/features/risk_alert/data/models/risk_alert.dart';
 
 class ActiveAlertCard extends StatelessWidget {
+  const ActiveAlertCard({
+    super.key,
+    required this.alert,
+    this.onDismiss,
+    this.onTap,
+    this.dismissLabel = 'Dismiss',
+  });
+
   final RiskAlert alert;
-  final VoidCallback onTap;
+  final VoidCallback? onDismiss;
+  final VoidCallback? onTap;
+  final String dismissLabel;
 
-  const ActiveAlertCard({Key? key, required this.alert, required this.onTap})
-    : super(key: key);
-
-  Color _getSeverityColor(String severity) {
-    switch (severity.toLowerCase()) {
-      case 'low':
-        return AppColors.safeGreen;
-      case 'medium':
-        return AppColors.riskYellow;
-      case 'high':
-        return AppColors.alertRed;
-      default:
-        return AppColors.textSecondary;
-    }
+  Color _severityColor(String severity) {
+    return switch (severity.toLowerCase()) {
+      'low' => AppColors.safeGreen,
+      'medium' => AppColors.riskYellow,
+      'high' => AppColors.alertRed,
+      _ => AppColors.textSecondary,
+    };
   }
 
-  IconData _getSeverityIcon(String severity) {
-    switch (severity.toLowerCase()) {
-      case 'high':
-        return Icons.warning;
-      case 'medium':
-        return Icons.info;
-      default:
-        return Icons.check_circle;
-    }
+  IconData _severityIcon(String severity) {
+    return switch (severity.toLowerCase()) {
+      'high' => Icons.warning_amber_rounded,
+      'medium' => Icons.info_outline_rounded,
+      _ => Icons.check_circle_outline_rounded,
+    };
   }
 
   @override
   Widget build(BuildContext context) {
-    final severityColor = _getSeverityColor(alert.severity);
-    final severityIcon = _getSeverityIcon(alert.severity);
+    final severityColor = _severityColor(alert.severity);
+    final severityIcon = _severityIcon(alert.severity);
 
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: AppColors.cardBackground,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: severityColor.withOpacity(0.3), width: 1),
-          boxShadow: [
-            BoxShadow(
-              color: AppColors.shadow,
-              blurRadius: 4,
-              offset: const Offset(0, 1),
+    return Material(
+      color: AppColors.cardBackground,
+      elevation: 4,
+      shadowColor: AppColors.shadow,
+      borderRadius: BorderRadius.circular(12),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(12),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: severityColor.withValues(alpha: 0.35),
+              width: 1,
             ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: severityColor.withOpacity(0.1),
-                shape: BoxShape.circle,
-              ),
-              alignment: Alignment.center,
-              child: Icon(severityIcon, color: severityColor, size: 24),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(
-                    alert.title,
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.w600,
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: severityColor.withValues(alpha: 0.12),
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(severityIcon, color: severityColor, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          alert.title,
+                          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        if (alert.message.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            alert.message,
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    alert.recommendation,
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  if (onDismiss != null)
+                    IconButton(
+                      onPressed: onDismiss,
+                      icon: const Icon(Icons.close, size: 20),
                       color: AppColors.textSecondary,
+                      tooltip: dismissLabel,
+                      visualDensity: VisualDensity.compact,
                     ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
                 ],
               ),
-            ),
-            const SizedBox(width: 12),
-            Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: AppColors.textSecondary,
-            ),
-          ],
+              if (alert.recommendation.isNotEmpty) ...[
+                const SizedBox(height: 10),
+                Text(
+                  alert.recommendation,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ],
+          ),
         ),
       ),
     );

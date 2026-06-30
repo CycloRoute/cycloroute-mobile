@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
-import 'package:cyclerisk/data/mock/mock_routes.dart' as route_data;
+import 'package:cyclerisk/features/route_results/data/models/route_option.dart';
 
 class RouteOptionCard extends StatelessWidget {
-  final route_data.Route route;
+  final RouteOption route;
   final VoidCallback onSelect;
   final bool isSelected;
 
@@ -15,39 +16,41 @@ class RouteOptionCard extends StatelessWidget {
     this.isSelected = false,
   });
 
-  Color _accentColor(String riskLevel) {
-    switch (riskLevel.toLowerCase()) {
-      case 'low':
-        return AppColors.safeGreen;
-      case 'medium':
-        return AppColors.riskYellow;
-      case 'high':
-        return AppColors.alertRed;
-      default:
-        return AppColors.textSecondary;
+  Color _accentForInfra(double coverage) {
+    if (coverage >= 0.5) {
+      return AppColors.primary;
     }
+    if (coverage >= 0.25) {
+      return AppColors.navigationCyan;
+    }
+    return AppColors.textSecondary;
   }
 
-  String _label(String riskLevel) {
-    switch (riskLevel.toLowerCase()) {
-      case 'low':
-        return 'Best fit';
-      case 'medium':
-        return 'Solid option';
-      case 'high':
-        return 'Direct option';
-      default:
-        return 'Option';
+  String _infraLabel(BuildContext context, double coverage) {
+    final l10n = appL10n(context);
+    if (coverage >= 0.5) {
+      return l10n.routeInfraHigh;
     }
+    if (coverage >= 0.25) {
+      return l10n.routeInfraMedium;
+    }
+    return l10n.routeInfraLow;
   }
 
   @override
   Widget build(BuildContext context) {
-    final accent = _accentColor(route.riskLevel);
+    final l10n = appL10n(context);
+    final distanceFormat = distanceFormatOf(context);
+    final infra = route.bikeInfrastructureCoverage;
+    final accent = _accentForInfra(infra);
     final traceProgress = isSelected ? 1.0 : 0.0;
-    final previewPoints = route.waypoints.length >= 3
-        ? [route.waypoints.first, route.waypoints[1], route.waypoints.last]
-        : route.waypoints;
+    final infraPercent = (infra * 100).round();
+    final previewPoints = route.why.isNotEmpty
+        ? route.why
+        : [
+            l10n.percentBikeInfra(infraPercent),
+            route.condition ?? route.label ?? route.routeId,
+          ];
 
     return InkWell(
       onTap: onSelect,
@@ -92,7 +95,7 @@ class RouteOptionCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            _label(route.riskLevel),
+                            _infraLabel(context, infra),
                             style: Theme.of(context).textTheme.labelSmall
                                 ?.copyWith(
                                   color: accent,
@@ -105,18 +108,20 @@ class RouteOptionCard extends StatelessWidget {
                       Row(
                         children: [
                           _Metric(
-                            label: 'Distance',
-                            value: '${route.distance.toStringAsFixed(1)} km',
+                            label: l10n.distance,
+                            value: distanceFormat.formatRouteDistance(
+                              route.distanceM,
+                            ),
                           ),
                           const SizedBox(width: 16),
                           _Metric(
-                            label: 'Time',
-                            value: '${route.duration} min',
+                            label: l10n.time,
+                            value: l10n.minutesShort(route.durationRounded),
                           ),
                           const SizedBox(width: 16),
                           _Metric(
-                            label: 'Fit',
-                            value: '${route.riskScore.toStringAsFixed(0)}',
+                            label: l10n.bikeInfrastructure,
+                            value: l10n.percentBikeInfra(infraPercent),
                           ),
                         ],
                       ),
@@ -164,7 +169,7 @@ class RouteOptionCard extends StatelessWidget {
               ClipRRect(
                 borderRadius: BorderRadius.circular(999),
                 child: LinearProgressIndicator(
-                  value: route.riskScore / 100,
+                  value: infra.clamp(0, 1),
                   minHeight: 3.5,
                   backgroundColor: AppColors.divider.withOpacity(0.65),
                   valueColor: AlwaysStoppedAnimation<Color>(
@@ -211,7 +216,7 @@ class _Metric extends StatelessWidget {
 }
 
 class _RouteTrace extends StatelessWidget {
-  final route_data.Route route;
+  final RouteOption route;
   final Color accent;
   final double progress;
 
@@ -246,13 +251,13 @@ class _RouteTrace extends StatelessWidget {
         ),
         const SizedBox(height: 10),
         Column(
-          children: route.waypoints.asMap().entries.map((entry) {
+          children: route.why.asMap().entries.map((entry) {
             final index = entry.key;
-            final waypoint = entry.value;
+            final reason = entry.value;
 
             return Padding(
                   padding: EdgeInsets.only(
-                    bottom: index < route.waypoints.length - 1 ? 8 : 0,
+                    bottom: index < route.why.length - 1 ? 8 : 0,
                   ),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -262,8 +267,7 @@ class _RouteTrace extends StatelessWidget {
                         height: 16,
                         margin: const EdgeInsets.only(top: 2),
                         decoration: BoxDecoration(
-                          color:
-                              index == 0 || index == route.waypoints.length - 1
+                          color: index == 0 || index == route.why.length - 1
                               ? accent
                               : accent.withOpacity(0.75),
                           shape: BoxShape.circle,
@@ -273,13 +277,12 @@ class _RouteTrace extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                          waypoint,
+                          reason,
                           style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(
                                 color: AppColors.textPrimary,
                                 fontWeight:
-                                    index == 0 ||
-                                        index == route.waypoints.length - 1
+                                    index == 0 || index == route.why.length - 1
                                     ? FontWeight.w700
                                     : FontWeight.w500,
                               ),
@@ -299,7 +302,7 @@ class _RouteTrace extends StatelessWidget {
 }
 
 class _RouteTracePainter extends CustomPainter {
-  final route_data.Route route;
+  final RouteOption route;
   final Color accent;
   final double progress;
 
@@ -326,9 +329,10 @@ class _RouteTracePainter extends CustomPainter {
     final left = 22.0;
     final top = 10.0;
     final usableHeight = size.height - top * 2;
-    final step = usableHeight / (route.waypoints.length - 1).clamp(1, 999);
+    final pointCount = route.coordinates.length.clamp(2, 8);
+    final step = usableHeight / (pointCount - 1).clamp(1, 999);
     final points = List<Offset>.generate(
-      route.waypoints.length,
+      pointCount,
       (index) => Offset(left + (index.isEven ? 0 : 16), top + step * index),
     );
 

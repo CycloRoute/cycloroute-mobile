@@ -49,6 +49,21 @@
 	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>CycloRoute uses your location to suggest better cycling routes and start navigation from your current position.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>CycloRoute needs background location during turn-by-turn navigation so your route stays updated when the screen is off.</string>
+	<key>NSLocationAlwaysUsageDescription</key>
+	<string>CycloRoute needs background location during turn-by-turn navigation so your route stays updated when the screen is off.</string>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>location</string>
+		<string>audio</string>
+	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>CycloRoute uses the camera so reviewers can capture cycling infrastructure photos.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>CycloRoute uses your photo library so reviewers can submit infrastructure images.</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

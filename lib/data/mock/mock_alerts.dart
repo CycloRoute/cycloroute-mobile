@@ -1,27 +1,4 @@
-class RiskAlert {
-  final String id;
-  final String
-  type; // e.g., 'high_traffic', 'intersection', 'poor_infrastructure'
-  final String title;
-  final String message;
-  final String recommendation;
-  final String severity; // 'low', 'medium', 'high'
-  final double latitude;
-  final double longitude;
-  final DateTime timestamp;
-
-  RiskAlert({
-    required this.id,
-    required this.type,
-    required this.title,
-    required this.message,
-    required this.recommendation,
-    required this.severity,
-    required this.latitude,
-    required this.longitude,
-    required this.timestamp,
-  });
-}
+import 'package:cyclerisk/features/risk_alert/data/models/risk_alert.dart';
 
 class MockAlerts {
   static List<RiskAlert> getAllAlerts() {
