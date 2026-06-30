@@ -15,6 +15,32 @@ import 'package:cyclerisk/core/services/user_preferences_sync.dart';
 import 'package:cyclerisk/features/navigation/domain/navigation_session_controller.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
 
+Route<dynamic>? _onGenerateRoute(RouteSettings settings) {
+  final name = settings.name;
+  if (name == null || name == '/' || name.isEmpty) {
+    return MaterialPageRoute<void>(
+      settings: const RouteSettings(name: '/'),
+      builder: (_) => const Scaffold(body: _LoadingHome()),
+    );
+  }
+
+  final builder = AppRoutes.getRoutes()[name];
+  if (builder != null) {
+    return MaterialPageRoute<void>(settings: settings, builder: builder);
+  }
+
+  return MaterialPageRoute<void>(
+    settings: const RouteSettings(name: '/'),
+    builder: (_) => const Scaffold(body: _LoadingHome()),
+  );
+}
+
+List<Route<dynamic>> _onGenerateInitialRoutes(String initialRoute) {
+  final name = initialRoute.isEmpty ? '/' : initialRoute;
+  final route = _onGenerateRoute(RouteSettings(name: name));
+  return [route!];
+}
+
 class CycloRouteApp extends StatelessWidget {
   const CycloRouteApp({super.key});
 
@@ -52,8 +78,8 @@ class CycloRouteApp extends StatelessWidget {
               GlobalCupertinoLocalizations.delegate,
             ],
             supportedLocales: AppLocalizations.supportedLocales,
-            home: const Scaffold(body: _LoadingHome()),
-            routes: AppRoutes.getRoutes(),
+            onGenerateRoute: _onGenerateRoute,
+            onGenerateInitialRoutes: _onGenerateInitialRoutes,
             debugShowCheckedModeBanner: false,
           );
         },

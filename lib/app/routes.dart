@@ -9,8 +9,9 @@ import 'package:cyclerisk/features/auth/presentation/screens/register_screen_new
 import 'package:cyclerisk/features/auth/presentation/screens/forgot_password_screen.dart';
 import 'package:cyclerisk/features/auth/presentation/screens/reset_password_screen.dart';
 import 'package:cyclerisk/features/settings/presentation/screens/settings_screen.dart';
+import 'package:cyclerisk/features/infrastructure/presentation/screens/infrastructure_admin_screen.dart';
 import 'package:cyclerisk/features/infrastructure/presentation/screens/reviewer_capture_screen.dart';
-import 'package:cyclerisk/features/infrastructure/presentation/screens/collaborative_map_screen.dart';
+import 'package:cyclerisk/features/infrastructure/presentation/screens/reviewer_map_screen.dart';
 import 'package:cyclerisk/features/profile/presentation/screens/profile_screen.dart';
 import 'package:cyclerisk/features/onboarding/presentation/screens/bike_onboarding_screen.dart';
 import 'package:cyclerisk/features/onboarding/presentation/screens/preference_onboarding_screen.dart';
@@ -24,6 +25,7 @@ import 'package:cyclerisk/features/reports/presentation/screens/create_report_sc
 import 'package:cyclerisk/features/reports/presentation/screens/reports_list_screen.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cyclerisk/features/reviewer/presentation/screens/reviewer_tools_screen.dart';
+import 'package:cyclerisk/core/widgets/admin_guard.dart';
 import 'package:cyclerisk/core/widgets/reviewer_guard.dart';
 import 'package:cyclerisk/features/auth/presentation/screens/terms_screen.dart';
 import 'package:cyclerisk/features/secondary/presentation/screens/secondary_screen.dart';
@@ -42,6 +44,7 @@ class AppRoutes {
   static const String settings = '/settings';
   static const String reviewerCapture = '/reviewer-capture';
   static const String collaborativeMap = '/collaborative-map';
+  static const String reviewerMap = '/reviewer-map';
   static const String profile = '/profile';
   static const String preferenceOnboarding = '/preference-onboarding';
   static const String bikeOnboarding = '/bike-onboarding';
@@ -53,6 +56,7 @@ class AppRoutes {
   static const String createReport = '/create-report';
   static const String myReports = '/my-reports';
   static const String reportsList = '/reports-list';
+  static const String infrastructureAdmin = '/infrastructure-admin';
   static const String reviewerTools = '/reviewer-tools';
   static const String secondary = '/secondary';
 
@@ -75,7 +79,9 @@ class AppRoutes {
       reviewerCapture: (context) =>
           const ReviewerGuard(child: ReviewerCaptureScreen()),
       collaborativeMap: (context) =>
-          const ReviewerGuard(child: CollaborativeMapScreen()),
+          const ReviewerGuard(child: ReviewerMapScreen()),
+      reviewerMap: (context) =>
+          const ReviewerGuard(child: ReviewerMapScreen()),
       profile: (context) => const ProfileScreen(),
       preferenceOnboarding: (context) => const PreferenceOnboardingScreen(),
       bikeOnboarding: (context) => const BikeOnboardingScreen(),
@@ -84,7 +90,7 @@ class AppRoutes {
       routeHistory: (context) => const RouteHistoryScreen(),
       routeHistoryDetail: (context) => const RouteHistoryDetailScreen(),
       routeCoverage: (context) =>
-          const ReviewerGuard(child: RouteCoverageScreen()),
+          const AdminGuard(child: RouteCoverageScreen()),
       createReport: (context) {
         final args = ModalRoute.of(context)?.settings.arguments;
         return CreateReportScreen(
@@ -94,8 +100,10 @@ class AppRoutes {
       myReports: (context) => const MyReportsScreen(),
       reportsList: (context) =>
           const ReviewerGuard(child: ReportsListScreen()),
+      infrastructureAdmin: (context) =>
+          const AdminGuard(child: InfrastructureAdminScreen()),
       reviewerTools: (context) =>
-          const ReviewerGuard(child: ReviewerToolsScreen()),
+          const AdminGuard(child: ReviewerToolsScreen()),
       secondary: (context) => const SecondaryScreen(title: 'Secondary Screen'),
     };
   }

@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:cyclerisk/core/config/app_config.dart';
+import 'package:cyclerisk/features/map/domain/cyclo_map_layers.dart';
+import 'package:cyclerisk/features/map/presentation/widgets/cyclo_map.dart';
 import 'package:cyclerisk/core/l10n/localize_api_error.dart';
 import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/providers/auth_provider.dart';
@@ -136,7 +137,7 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.communityReportThanks)),
+        SnackBar(content: Text(l10n.communityReportPendingMessage)),
       );
       Navigator.of(context).pop(true);
     } on ApiException catch (e) {
@@ -198,35 +199,15 @@ class _CreateReportScreenState extends State<CreateReportScreen> {
             child: SizedBox(
               height: 220,
               child: _mapReady && pin != null
-                  ? Stack(
-                      children: [
-                        FlutterMap(
-                          mapController: _mapController,
-                          options: MapOptions(
-                            center: pin,
-                            zoom: 16,
-                            minZoom: 5,
-                            maxZoom: 18,
-                            onPositionChanged: (position, _) {
-                              _onMapMoved(position);
-                            },
-                          ),
-                          children: [
-                            TileLayer(
-                              urlTemplate: AppConfig.mapTileUrlTemplate,
-                              subdomains: AppConfig.mapTileSubdomains,
-                              userAgentPackageName: 'com.cyclerisk.app',
-                            ),
-                          ],
-                        ),
-                        const Center(
-                          child: Icon(
-                            Icons.location_pin,
-                            size: 42,
-                            color: AppColors.alertRed,
-                          ),
-                        ),
-                      ],
+                  ? CycloMap(
+                      mapController: _mapController,
+                      center: pin,
+                      zoom: 16,
+                      height: 220,
+                      borderRadius: 0,
+                      layers: CycloMapLayers.reportPin,
+                      showCenterPin: true,
+                      onPositionChanged: (position, _) => _onMapMoved(position),
                     )
                   : const Center(child: CircularProgressIndicator()),
             ),

@@ -4,6 +4,29 @@ import 'package:cyclerisk/features/reports/domain/community_obstacle_alerts.dart
 import 'package:flutter_test/flutter_test.dart';
 
 void main() {
+  test('pending reports are not treated as active', () {
+    const pending = ObstacleReport(
+      id: 'p1',
+      lat: 0,
+      lng: 0,
+      type: 'obstacle',
+      description: 'test',
+      status: 'pending',
+    );
+    const active = ObstacleReport(
+      id: 'a1',
+      lat: 0,
+      lng: 0,
+      type: 'obstacle',
+      description: 'test',
+      status: 'active',
+    );
+
+    expect(pending.isActive, isFalse);
+    expect(pending.isPending, isTrue);
+    expect(active.isActive, isTrue);
+  });
+
   test('maps community report to risk alert with stable id', () {
     final alert = CommunityObstacleAlerts.toRiskAlert(
       ObstacleReport(

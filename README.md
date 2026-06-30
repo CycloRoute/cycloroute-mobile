@@ -93,6 +93,15 @@ MAPTILER_STYLE=streets-v2
 If `MAPTILER_API_KEY` is empty, the app falls back to OpenStreetMap tiles for
 local development only.
 
+## Map layers (CycloMap)
+
+The app uses a unified `CycloMap` widget (`lib/features/map/presentation/widgets/cyclo_map.dart`) across home, navigation, route preview, location pickers, and the reviewer map.
+
+- **Obstacle reports (moderated):** Community obstacles feed the alert layer during navigation. **Reviewers** approve, reject, edit, and delete obstacle reports.
+- **AI infrastructure:** Reviewers submit photo captures (analyzed, pending). **Admins** manage them in **Administrar infraestructura IA** (queue + map): approve to update the graph, reject, or delete rejected items.
+
+`cycloroute-engine` is unchanged in this phase — moderated obstacles affect alerts and map display only, not graph routing weights.
+
 ## Auth
 
 Auth is handled through:

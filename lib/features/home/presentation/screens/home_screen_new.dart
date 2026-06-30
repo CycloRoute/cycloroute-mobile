@@ -1,6 +1,7 @@
+import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:cyclerisk/app/routes.dart';
 import 'package:cyclerisk/core/l10n/l10n.dart';
@@ -14,7 +15,10 @@ import 'package:cyclerisk/features/navigation/presentation/navigation_resume_coo
 import 'package:cyclerisk/features/navigation/presentation/widgets/active_navigation_banner.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
 import 'package:cyclerisk/features/shared/widgets/location_permission_banner.dart';
-import 'package:cyclerisk/features/shared/widgets/osm_map_widget.dart';
+import 'package:cyclerisk/features/map/domain/cyclo_map_layers.dart';
+import 'package:cyclerisk/features/map/domain/cyclo_map_marker_tap.dart';
+import 'package:cyclerisk/features/map/presentation/widgets/cyclo_map.dart';
+import 'package:cyclerisk/features/reports/presentation/widgets/obstacle_detail_sheet.dart';
 
 class HomeScreenNew extends StatefulWidget {
   const HomeScreenNew({super.key});
@@ -24,10 +28,19 @@ class HomeScreenNew extends StatefulWidget {
 }
 
 class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserver {
+  static const double _homeMapZoom = 16;
+  static final LatLng _fallbackMapCenter = LatLng(-12.0464, -77.0428);
+
+  final MapController _mapController = MapController();
+  bool _showObstacles = false;
+  bool _showInfrastructure = false;
+  LatLng? _anchoredMapCenter;
+
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    context.read<LocationProvider>().addListener(_handleLocationUpdate);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final locationProvider = context.read<LocationProvider>();
       await locationProvider.refreshAccessStatus();
@@ -35,6 +48,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
         await locationProvider.getCurrentLocation();
       }
       if (!mounted) return;
+      _handleLocationUpdate();
       final user = await context.read<AuthProvider>().refreshProfile();
       if (!mounted) return;
       await UserPreferencesSync.applyFromAuthUserIfPresent(
@@ -50,8 +64,25 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
 
   @override
   void dispose() {
+    context.read<LocationProvider>().removeListener(_handleLocationUpdate);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  void _handleLocationUpdate() {
+    if (!mounted) return;
+
+    final location = context.read<LocationProvider>().currentLocation;
+    if (location == null || _anchoredMapCenter != null) {
+      return;
+    }
+
+    _anchoredMapCenter = location;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      _mapController.move(location, _homeMapZoom);
+    });
+    setState(() {});
   }
 
   @override
@@ -73,13 +104,22 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
     Navigator.of(context).pushNamed(AppRoutes.routeSearch);
   }
 
+  void _onMapMarkerTap(CycloMapMarkerTap tap) {
+    if (tap case CycloMapObstacleTap(:final report)) {
+      showObstacleDetailSheet(context, report);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = appL10n(context);
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         title: Text(
           l10n.appName,
           style: const TextStyle(fontWeight: FontWeight.w800),
@@ -101,41 +141,37 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
             child: Consumer<LocationProvider>(
               builder: (context, loc, _) {
                 final location = loc.currentLocation;
-                return OsmMapWidget(
-                  center: location,
-                  zoom: location == null ? 13 : 17,
-                  markers: location == null
-                      ? const []
-                      : [
-                          Marker(
-                            width: 46,
-                            height: 46,
-                            point: location,
-                            builder: (_) => Container(
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: AppColors.primaryGradient,
-                                ),
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 3),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: AppColors.primary.withValues(alpha: 0.28),
-                                    blurRadius: 14,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: const Icon(
-                                Icons.my_location_rounded,
-                                color: Colors.white,
-                                size: 22,
-                              ),
-                            ),
-                          ),
-                        ],
+                final layers = CycloMapLayers(
+                  showUserLocation: true,
+                  showCommunityObstacles: _showObstacles,
+                  showInfrastructureIa: _showInfrastructure,
+                );
+                return CycloMap(
+                  mapController: _mapController,
+                  center: _anchoredMapCenter ?? _fallbackMapCenter,
+                  zoom: _homeMapZoom,
+                  followCenter: false,
+                  height: double.infinity,
+                  borderRadius: 0,
+                  layers: layers,
+                  mode: CycloMapMode.user,
+                  userLocation: location,
+                  showLegend: _showObstacles || _showInfrastructure,
+                  onMarkerTap: _showObstacles ? _onMapMarkerTap : null,
                 );
               },
+            ),
+          ),
+          Positioned(
+            left: 12,
+            right: 12,
+            bottom: 120,
+            child: _HomeLayerChips(
+              showObstacles: _showObstacles,
+              showInfrastructure: _showInfrastructure,
+              onObstaclesChanged: (v) => setState(() => _showObstacles = v),
+              onInfrastructureChanged: (v) =>
+                  setState(() => _showInfrastructure = v),
             ),
           ),
           Positioned(
@@ -172,6 +208,7 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
             ),
           ),
         ],
+      ),
       ),
     );
   }
@@ -484,26 +521,12 @@ class _HomeMenuButton extends StatelessWidget {
                 title: Text(l10n.myObstacleReports),
               ),
             ),
-            if (auth.canReviewInfrastructure) ...[
+            if (auth.canModerateObstacles) ...[
               PopupMenuItem<String>(
                 value: 'collaborative_map',
                 child: ListTile(
                   leading: const Icon(Icons.map_outlined),
-                  title: Text(l10n.collaborativeMap),
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'route_coverage',
-                child: ListTile(
-                  leading: const Icon(Icons.layers_outlined),
-                  title: Text(l10n.aiRouteCoverage),
-                ),
-              ),
-              PopupMenuItem<String>(
-                value: 'reviewer_capture',
-                child: ListTile(
-                  leading: const Icon(Icons.camera_alt_outlined),
-                  title: Text(l10n.reviewInfrastructure),
+                  title: Text(l10n.reviewerMap),
                 ),
               ),
               PopupMenuItem<String>(
@@ -511,6 +534,29 @@ class _HomeMenuButton extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.list_alt_outlined),
                   title: Text(l10n.obstacleReports),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'reviewer_capture',
+                child: ListTile(
+                  leading: const Icon(Icons.camera_alt_outlined),
+                  title: Text(l10n.submitInfrastructureCapture),
+                ),
+              ),
+            ],
+            if (auth.canManageInfrastructureIa) ...[
+              PopupMenuItem<String>(
+                value: 'infrastructure_admin',
+                child: ListTile(
+                  leading: const Icon(Icons.admin_panel_settings_outlined),
+                  title: Text(l10n.infrastructureAdminTitle),
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'route_coverage',
+                child: ListTile(
+                  leading: const Icon(Icons.layers_outlined),
+                  title: Text(l10n.aiRouteCoverage),
                 ),
               ),
               PopupMenuItem<String>(
@@ -559,6 +605,7 @@ class _HomeMenuButton extends StatelessWidget {
       'collaborative_map': AppRoutes.collaborativeMap,
       'route_coverage': AppRoutes.routeCoverage,
       'reviewer_capture': AppRoutes.reviewerCapture,
+      'infrastructure_admin': AppRoutes.infrastructureAdmin,
       'reports_list': AppRoutes.reportsList,
       'reviewer_tools': AppRoutes.reviewerTools,
     };
@@ -567,5 +614,39 @@ class _HomeMenuButton extends StatelessWidget {
     if (route != null) {
       Navigator.of(context).pushNamed(route);
     }
+  }
+}
+
+class _HomeLayerChips extends StatelessWidget {
+  const _HomeLayerChips({
+    required this.showObstacles,
+    required this.showInfrastructure,
+    required this.onObstaclesChanged,
+    required this.onInfrastructureChanged,
+  });
+
+  final bool showObstacles;
+  final bool showInfrastructure;
+  final ValueChanged<bool> onObstaclesChanged;
+  final ValueChanged<bool> onInfrastructureChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = appL10n(context);
+    return Wrap(
+      spacing: 8,
+      children: [
+        FilterChip(
+          label: Text(l10n.mapLayerObstacles),
+          selected: showObstacles,
+          onSelected: onObstaclesChanged,
+        ),
+        FilterChip(
+          label: Text(l10n.mapLayerInfrastructure),
+          selected: showInfrastructure,
+          onSelected: onInfrastructureChanged,
+        ),
+      ],
+    );
   }
 }

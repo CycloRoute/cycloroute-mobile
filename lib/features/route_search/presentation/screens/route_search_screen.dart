@@ -54,10 +54,14 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
   bool _destinationShortcutsExpanded = false;
   String? _errorMessage;
   bool _loadedRouteArguments = false;
+  LocationProvider? _locationProvider;
+  bool _originAutoFillPending = true;
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    _attachLocationListener();
+
     if (_loadedRouteArguments) {
       return;
     }
@@ -69,6 +73,23 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
       _selectedDestination = args;
       _destinationController.text = args.localizedTitle(l10n);
     }
+  }
+
+  void _attachLocationListener() {
+    final provider = context.read<LocationProvider>();
+    if (_locationProvider == provider) {
+      return;
+    }
+    _locationProvider?.removeListener(_onLocationProviderChanged);
+    _locationProvider = provider;
+    _locationProvider!.addListener(_onLocationProviderChanged);
+  }
+
+  void _onLocationProviderChanged() {
+    if (!mounted || !_originAutoFillPending) {
+      return;
+    }
+    _applyOriginFromProvider(appL10n(context), force: false);
   }
 
   @override
@@ -89,6 +110,7 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
 
   @override
   void dispose() {
+    _locationProvider?.removeListener(_onLocationProviderChanged);
     _originDebounce?.cancel();
     _destinationDebounce?.cancel();
     _destinationFocusNode.removeListener(_onDestinationFocusChanged);
@@ -115,42 +137,56 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
   }
 
   Future<void> _syncCurrentLocation({bool force = false}) async {
+    if (!mounted) return;
+
     final l10n = appL10n(context);
     final locationProvider = context.read<LocationProvider>();
 
-    if (force || locationProvider.currentLocation == null) {
+    await locationProvider.refreshAccessStatus();
+
+    if (!locationProvider.hasLocationAccess) {
       final granted = await locationProvider.ensureAccess(
         context,
         showRationale: force,
       );
-      if (!granted && !mounted) {
+      if (!mounted) return;
+      if (!granted && locationProvider.currentLocation == null) {
         return;
       }
-    } else if (!locationProvider.hasLocationAccess) {
-      await locationProvider.refreshAccessStatus();
     }
 
-    if (locationProvider.currentLocation == null && locationProvider.hasLocationAccess) {
+    if (locationProvider.hasLocationAccess &&
+        (force || locationProvider.currentLocation == null)) {
       await locationProvider.getCurrentLocation();
     }
 
-    final location = locationProvider.currentLocation;
-    if (!mounted || location == null) {
+    if (!mounted) return;
+    _applyOriginFromProvider(l10n, force: force);
+  }
+
+  void _applyOriginFromProvider(AppLocalizations l10n, {required bool force}) {
+    final location = context.read<LocationProvider>().currentLocation;
+    if (location == null) {
+      return;
+    }
+
+    final shouldApply = force ||
+        _selectedOrigin == null ||
+        _originController.text.trim().isEmpty ||
+        _selectedOrigin?.kind == PlaceSuggestionKind.currentLocation;
+
+    if (!shouldApply) {
       return;
     }
 
     final origin = PlaceSuggestion.currentLocation(
       GeoPoint(lat: location.latitude, lng: location.longitude),
     );
+
     setState(() {
-      if (force || _selectedOrigin == null) {
-        _selectedOrigin = origin;
-      }
-      if (force ||
-          _originController.text.trim().isEmpty ||
-          _selectedOrigin?.kind == PlaceSuggestionKind.currentLocation) {
-        _originController.text = origin.localizedTitle(l10n);
-      }
+      _selectedOrigin = origin;
+      _originController.text = origin.localizedTitle(l10n);
+      _originAutoFillPending = false;
     });
   }
 
@@ -197,6 +233,7 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
     if (_selectedOrigin != null &&
         _selectedOrigin!.localizedTitle(appL10n(context)) != value.trim()) {
       _selectedOrigin = null;
+      _originAutoFillPending = false;
     }
     _searchPlaces(value, isOrigin: true);
   }
@@ -304,6 +341,8 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
         _originController.text = place.localizedTitle(l10n);
         _originSuggestions = const [];
         _originFocusNode.unfocus();
+        _originAutoFillPending =
+            place.kind == PlaceSuggestionKind.currentLocation;
       } else {
         _selectedDestination = place;
         _destinationController.text = place.localizedTitle(l10n);
@@ -527,7 +566,9 @@ class _RouteSearchScreenState extends State<RouteSearchScreen> {
                 focusNode: _originFocusNode,
                 icon: Icons.my_location_rounded,
                 suggestions: _originSuggestions,
-                isLoading: _loadingOriginSuggestions,
+                isLoading: _loadingOriginSuggestions ||
+                    (context.watch<LocationProvider>().isLoading &&
+                        _originController.text.trim().isEmpty),
                 l10n: l10n,
                 onChanged: _onOriginChanged,
                 onSubmitted: (_) => _openRouteOptions(),

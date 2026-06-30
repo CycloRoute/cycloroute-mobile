@@ -6,7 +6,8 @@ import 'package:cyclerisk/features/route_results/data/models/route_option.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_options_result.dart';
 import 'package:cyclerisk/features/navigation/presentation/utils/route_segment_polylines.dart';
 import 'package:cyclerisk/features/route_results/presentation/utils/route_map_bounds.dart';
-import 'package:cyclerisk/features/shared/widgets/osm_map_widget.dart';
+import 'package:cyclerisk/features/map/domain/cyclo_map_layers.dart';
+import 'package:cyclerisk/features/map/presentation/widgets/cyclo_map.dart';
 
 class RoutePreviewMapWidget extends StatelessWidget {
   const RoutePreviewMapWidget({
@@ -91,13 +92,14 @@ class RoutePreviewMapWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         child: Stack(
           children: [
-            OsmMapWidget(
+            CycloMap(
               center: bounds.center,
               zoom: bounds.zoom,
               height: height,
               borderRadius: 0,
+              layers: CycloMapLayers.routePreview,
               polylines: polylines,
-              markers: [
+              extraMarkers: [
                 Marker(
                   width: 40,
                   height: 40,

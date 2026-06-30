@@ -94,7 +94,7 @@ class GeolocationService {
 
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
-        timeLimit: const Duration(seconds: 10),
+        timeLimit: const Duration(seconds: 15),
       );
 
       debugPrint(
@@ -111,6 +111,20 @@ class GeolocationService {
       );
     } catch (e) {
       debugPrint('Error getting location: $e');
+      try {
+        final lastKnown = await Geolocator.getLastKnownPosition();
+        if (lastKnown != null) {
+          return LocationSnapshot(
+            point: LatLng(lastKnown.latitude, lastKnown.longitude),
+            heading: lastKnown.heading,
+            speed: lastKnown.speed,
+            accuracy: lastKnown.accuracy,
+            timestamp: lastKnown.timestamp,
+          );
+        }
+      } catch (_) {
+        // Fall through to null.
+      }
       return null;
     }
   }

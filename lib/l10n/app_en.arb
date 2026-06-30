@@ -15,9 +15,26 @@
   "savedRoutes": "Saved routes",
   "routeHistory": "Route history",
   "reportObstacle": "Report obstacle",
-  "collaborativeMap": "Collaborative map",
+  "collaborativeMap": "Reviewer map",
   "aiRouteCoverage": "AI route coverage",
   "reviewInfrastructure": "Review infrastructure",
+  "submitInfrastructureCapture": "Submit infrastructure capture",
+  "infrastructureAdminTitle": "Manage AI infrastructure",
+  "infrastructureAdminSubtitle": "Review captures submitted by collaborators, approve valid ones to update the routing graph, or reject invalid submissions.",
+  "infrastructureAdminListTab": "Queue",
+  "infrastructureAdminMapTab": "Map",
+  "infrastructureEmptyPending": "No captures waiting for review.",
+  "infrastructureEmptyActive": "No active captures on the map.",
+  "infrastructureEmptyHidden": "No rejected captures.",
+  "infrastructureEmptyAll": "No AI infrastructure captures yet.",
+  "infrastructureSubmittedBy": "Submitted by {name}",
+  "@infrastructureSubmittedBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "couldNotLoadInfrastructure": "Could not load AI infrastructure",
+  "infrastructureApproveGraphHint": "Approving updates the routing graph. Rejecting hides the capture without changing the graph.",
   "obstacleReports": "Obstacle reports",
   "reviewerTools": "Reviewer tools",
   "accessDenied": "Access denied",
@@ -160,9 +177,9 @@
   "obstacleSubmitted": "Obstacle report submitted.",
   "couldNotSubmitReport": "Could not submit report",
   "submitReport": "Submit report",
-  "noReportsYet": "No reports yet",
+  "noReportsYet": "No obstacle reports yet :(",
   "couldNotLoadReports": "Could not load reports",
-  "couldNotLoadCollaborativeMap": "Could not load collaborative map",
+  "couldNotLoadCollaborativeMap": "Could not load reviewer map",
   "couldNotLoadCoverage": "Could not load coverage",
   "captureInfrastructure": "Capture street infrastructure",
   "reviewerCaptureHint": "Your photo and GPS help improve the collaborative map for all cyclists.",
@@ -442,5 +459,86 @@
       "count": {"type": "int"}
     }
   },
-  "showFewerSteps": "Show fewer"
+  "showFewerSteps": "Show fewer",
+  "reviewerMap": "Reviewer map",
+  "mapLayerObstacles": "Obstacles",
+  "mapLayerInfrastructure": "Infrastructure",
+  "mapLayerCoverage": "Graph coverage",
+  "moderationApprove": "Approve",
+  "moderationReject": "Reject / Hide",
+  "moderationPending": "Pending",
+  "reportAwaitingReview": "Awaiting review",
+  "communityReportPendingMessage": "Thanks. Your report is pending review before it appears on the map.",
+  "moderationActive": "Active",
+  "moderationHidden": "Rejected",
+  "moderationAll": "All",
+  "editReport": "Edit",
+  "deleteReport": "Delete",
+  "confirmDeleteReport": "Delete this obstacle report?",
+  "saveChanges": "Save changes",
+  "couldNotUpdateReport": "Could not update report",
+  "obstacleTimeRemaining": "Time remaining",
+  "obstacleVisibleUntilLabel": "Visible until",
+  "obstacleVisibleUntil": "Visible until {date}",
+  "@obstacleVisibleUntil": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "obstacleNoExpiry": "No expiry date",
+  "obstacleExpired": "Expired",
+  "obstacleTimeRemainingDays": "{days} days left",
+  "@obstacleTimeRemainingDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "obstacleTimeRemainingHours": "{hours} hours left",
+  "@obstacleTimeRemainingHours": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "obstacleTimeRemainingMinutes": "{minutes} minutes left",
+  "@obstacleTimeRemainingMinutes": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "obstacleReportedAt": "Reported",
+  "obstacleAuthor": "Author",
+  "obstacleActiveDuration": "Days visible on map",
+  "analysisResultTitle": "Analysis result",
+  "analysisResultSubtitle": "The AI reviewed your photo and updated the cycling map near this location.",
+  "analysisResultScoreLabel": "of 100",
+  "qualityGoodTitle": "Good infrastructure",
+  "qualityGoodDescription": "The area looks safe and comfortable for cycling. Nearby routes will favor this segment.",
+  "qualityRegularTitle": "Fair infrastructure",
+  "qualityRegularDescription": "Some elements could be improved. The score was blended into nearby routes with moderate weight.",
+  "qualityBadTitle": "Poor infrastructure",
+  "qualityBadDescription": "The scene shows risks for cyclists (traffic, obstacles, or missing bike infrastructure). Nearby routes were penalized to protect riders.",
+  "graphImpactTitle": "Map and routing impact",
+  "graphImpactDescription": "The engine adjusted street graph edges around your GPS point so future route suggestions reflect what was detected.",
+  "graphImpactPendingDescription": "The analysis is saved as pending. The graph will only be updated after an admin approves this capture.",
+  "graphUpdatePendingApproval": "Pending approval — graph not updated yet",
+  "graphEdgesWouldUpdate": "Estimated edges on approval: {count}",
+  "@graphEdgesWouldUpdate": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "infrastructurePendingReviewTitle": "Awaiting reviewer approval",
+  "infrastructurePendingReviewBody": "Your capture was analyzed successfully. It will appear on the reviewer map and affect routing only after an admin approves it.",
+  "infrastructureAdminApproveOnly": "Only an admin can approve this capture and update the routing graph. You can still reject invalid submissions.",
+  "reportSubmittedForReview": "Submitted for review. The map and routes will update once an admin approves it.",
+  "graphRadiusDetail": "Influence radius: {meters} m",
+  "@graphRadiusDetail": {
+    "placeholders": {
+      "meters": {"type": "int"}
+    }
+  },
+  "graphUpdateApplied": "Graph update applied successfully",
+  "graphUpdateNotApplied": "Graph update could not be applied (no nearby edges)",
+  "detectionsSubtitle": "Objects detected by the vision model in your photo:",
+  "acceptAndGoHome": "Accept"
 }

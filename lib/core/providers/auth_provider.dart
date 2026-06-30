@@ -67,7 +67,9 @@ class AuthProvider extends ChangeNotifier {
       _hasCompletedPreferenceOnboarding;
   ApiException? get lastApiError => _lastApiError;
   bool get sessionExpired => _sessionExpired;
-  bool get canReviewInfrastructure => _role.canReviewInfrastructure;
+  bool get canModerateObstacles => _role.canModerateObstacles;
+  bool get canManageInfrastructureIa => _role.canManageInfrastructureIa;
+  bool get isAdmin => _role.isAdmin;
 
   String get displayName => _fullName?.trim().isNotEmpty == true
       ? _fullName!.trim()

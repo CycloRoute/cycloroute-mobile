@@ -191,7 +191,7 @@ abstract class AppLocalizations {
   /// No description provided for @collaborativeMap.
   ///
   /// In en, this message translates to:
-  /// **'Collaborative map'**
+  /// **'Reviewer map'**
   String get collaborativeMap;
 
   /// No description provided for @aiRouteCoverage.
@@ -205,6 +205,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Review infrastructure'**
   String get reviewInfrastructure;
+
+  /// No description provided for @submitInfrastructureCapture.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit infrastructure capture'**
+  String get submitInfrastructureCapture;
+
+  /// No description provided for @infrastructureAdminTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage AI infrastructure'**
+  String get infrastructureAdminTitle;
+
+  /// No description provided for @infrastructureAdminSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Review captures submitted by collaborators, approve valid ones to update the routing graph, or reject invalid submissions.'**
+  String get infrastructureAdminSubtitle;
+
+  /// No description provided for @infrastructureAdminListTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Queue'**
+  String get infrastructureAdminListTab;
+
+  /// No description provided for @infrastructureAdminMapTab.
+  ///
+  /// In en, this message translates to:
+  /// **'Map'**
+  String get infrastructureAdminMapTab;
+
+  /// No description provided for @infrastructureEmptyPending.
+  ///
+  /// In en, this message translates to:
+  /// **'No captures waiting for review.'**
+  String get infrastructureEmptyPending;
+
+  /// No description provided for @infrastructureEmptyActive.
+  ///
+  /// In en, this message translates to:
+  /// **'No active captures on the map.'**
+  String get infrastructureEmptyActive;
+
+  /// No description provided for @infrastructureEmptyHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'No rejected captures.'**
+  String get infrastructureEmptyHidden;
+
+  /// No description provided for @infrastructureEmptyAll.
+  ///
+  /// In en, this message translates to:
+  /// **'No AI infrastructure captures yet.'**
+  String get infrastructureEmptyAll;
+
+  /// No description provided for @infrastructureSubmittedBy.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted by {name}'**
+  String infrastructureSubmittedBy(String name);
+
+  /// No description provided for @couldNotLoadInfrastructure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not load AI infrastructure'**
+  String get couldNotLoadInfrastructure;
+
+  /// No description provided for @infrastructureApproveGraphHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Approving updates the routing graph. Rejecting hides the capture without changing the graph.'**
+  String get infrastructureApproveGraphHint;
 
   /// No description provided for @obstacleReports.
   ///
@@ -965,7 +1037,7 @@ abstract class AppLocalizations {
   /// No description provided for @noReportsYet.
   ///
   /// In en, this message translates to:
-  /// **'No reports yet'**
+  /// **'No obstacle reports yet :('**
   String get noReportsYet;
 
   /// No description provided for @couldNotLoadReports.
@@ -977,7 +1049,7 @@ abstract class AppLocalizations {
   /// No description provided for @couldNotLoadCollaborativeMap.
   ///
   /// In en, this message translates to:
-  /// **'Could not load collaborative map'**
+  /// **'Could not load reviewer map'**
   String get couldNotLoadCollaborativeMap;
 
   /// No description provided for @couldNotLoadCoverage.
@@ -2119,6 +2191,312 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show fewer'**
   String get showFewerSteps;
+
+  /// No description provided for @reviewerMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Reviewer map'**
+  String get reviewerMap;
+
+  /// No description provided for @mapLayerObstacles.
+  ///
+  /// In en, this message translates to:
+  /// **'Obstacles'**
+  String get mapLayerObstacles;
+
+  /// No description provided for @mapLayerInfrastructure.
+  ///
+  /// In en, this message translates to:
+  /// **'Infrastructure'**
+  String get mapLayerInfrastructure;
+
+  /// No description provided for @mapLayerCoverage.
+  ///
+  /// In en, this message translates to:
+  /// **'Graph coverage'**
+  String get mapLayerCoverage;
+
+  /// No description provided for @moderationApprove.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get moderationApprove;
+
+  /// No description provided for @moderationReject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject / Hide'**
+  String get moderationReject;
+
+  /// No description provided for @moderationPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get moderationPending;
+
+  /// No description provided for @reportAwaitingReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting review'**
+  String get reportAwaitingReview;
+
+  /// No description provided for @communityReportPendingMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Thanks. Your report is pending review before it appears on the map.'**
+  String get communityReportPendingMessage;
+
+  /// No description provided for @moderationActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get moderationActive;
+
+  /// No description provided for @moderationHidden.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get moderationHidden;
+
+  /// No description provided for @moderationAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get moderationAll;
+
+  /// No description provided for @editReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get editReport;
+
+  /// No description provided for @deleteReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get deleteReport;
+
+  /// No description provided for @confirmDeleteReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this obstacle report?'**
+  String get confirmDeleteReport;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save changes'**
+  String get saveChanges;
+
+  /// No description provided for @couldNotUpdateReport.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not update report'**
+  String get couldNotUpdateReport;
+
+  /// No description provided for @obstacleTimeRemaining.
+  ///
+  /// In en, this message translates to:
+  /// **'Time remaining'**
+  String get obstacleTimeRemaining;
+
+  /// No description provided for @obstacleVisibleUntilLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible until'**
+  String get obstacleVisibleUntilLabel;
+
+  /// No description provided for @obstacleVisibleUntil.
+  ///
+  /// In en, this message translates to:
+  /// **'Visible until {date}'**
+  String obstacleVisibleUntil(String date);
+
+  /// No description provided for @obstacleNoExpiry.
+  ///
+  /// In en, this message translates to:
+  /// **'No expiry date'**
+  String get obstacleNoExpiry;
+
+  /// No description provided for @obstacleExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Expired'**
+  String get obstacleExpired;
+
+  /// No description provided for @obstacleTimeRemainingDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{days} days left'**
+  String obstacleTimeRemainingDays(int days);
+
+  /// No description provided for @obstacleTimeRemainingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours left'**
+  String obstacleTimeRemainingHours(int hours);
+
+  /// No description provided for @obstacleTimeRemainingMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{minutes} minutes left'**
+  String obstacleTimeRemainingMinutes(int minutes);
+
+  /// No description provided for @obstacleReportedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Reported'**
+  String get obstacleReportedAt;
+
+  /// No description provided for @obstacleAuthor.
+  ///
+  /// In en, this message translates to:
+  /// **'Author'**
+  String get obstacleAuthor;
+
+  /// No description provided for @obstacleActiveDuration.
+  ///
+  /// In en, this message translates to:
+  /// **'Days visible on map'**
+  String get obstacleActiveDuration;
+
+  /// No description provided for @analysisResultTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Analysis result'**
+  String get analysisResultTitle;
+
+  /// No description provided for @analysisResultSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI reviewed your photo and updated the cycling map near this location.'**
+  String get analysisResultSubtitle;
+
+  /// No description provided for @analysisResultScoreLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'of 100'**
+  String get analysisResultScoreLabel;
+
+  /// No description provided for @qualityGoodTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Good infrastructure'**
+  String get qualityGoodTitle;
+
+  /// No description provided for @qualityGoodDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The area looks safe and comfortable for cycling. Nearby routes will favor this segment.'**
+  String get qualityGoodDescription;
+
+  /// No description provided for @qualityRegularTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Fair infrastructure'**
+  String get qualityRegularTitle;
+
+  /// No description provided for @qualityRegularDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Some elements could be improved. The score was blended into nearby routes with moderate weight.'**
+  String get qualityRegularDescription;
+
+  /// No description provided for @qualityBadTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Poor infrastructure'**
+  String get qualityBadTitle;
+
+  /// No description provided for @qualityBadDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The scene shows risks for cyclists (traffic, obstacles, or missing bike infrastructure). Nearby routes were penalized to protect riders.'**
+  String get qualityBadDescription;
+
+  /// No description provided for @graphImpactTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Map and routing impact'**
+  String get graphImpactTitle;
+
+  /// No description provided for @graphImpactDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The engine adjusted street graph edges around your GPS point so future route suggestions reflect what was detected.'**
+  String get graphImpactDescription;
+
+  /// No description provided for @graphImpactPendingDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'The analysis is saved as pending. The graph will only be updated after an admin approves this capture.'**
+  String get graphImpactPendingDescription;
+
+  /// No description provided for @graphUpdatePendingApproval.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending approval — graph not updated yet'**
+  String get graphUpdatePendingApproval;
+
+  /// No description provided for @graphEdgesWouldUpdate.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated edges on approval: {count}'**
+  String graphEdgesWouldUpdate(int count);
+
+  /// No description provided for @infrastructurePendingReviewTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting reviewer approval'**
+  String get infrastructurePendingReviewTitle;
+
+  /// No description provided for @infrastructurePendingReviewBody.
+  ///
+  /// In en, this message translates to:
+  /// **'Your capture was analyzed successfully. It will appear on the reviewer map and affect routing only after an admin approves it.'**
+  String get infrastructurePendingReviewBody;
+
+  /// No description provided for @infrastructureAdminApproveOnly.
+  ///
+  /// In en, this message translates to:
+  /// **'Only an admin can approve this capture and update the routing graph. You can still reject invalid submissions.'**
+  String get infrastructureAdminApproveOnly;
+
+  /// No description provided for @reportSubmittedForReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted for review. The map and routes will update once an admin approves it.'**
+  String get reportSubmittedForReview;
+
+  /// No description provided for @graphRadiusDetail.
+  ///
+  /// In en, this message translates to:
+  /// **'Influence radius: {meters} m'**
+  String graphRadiusDetail(int meters);
+
+  /// No description provided for @graphUpdateApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Graph update applied successfully'**
+  String get graphUpdateApplied;
+
+  /// No description provided for @graphUpdateNotApplied.
+  ///
+  /// In en, this message translates to:
+  /// **'Graph update could not be applied (no nearby edges)'**
+  String get graphUpdateNotApplied;
+
+  /// No description provided for @detectionsSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Objects detected by the vision model in your photo:'**
+  String get detectionsSubtitle;
+
+  /// No description provided for @acceptAndGoHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get acceptAndGoHome;
 }
 
 class _AppLocalizationsDelegate

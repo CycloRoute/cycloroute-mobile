@@ -50,6 +50,7 @@ class InfrastructureAnalysisResult {
     required this.imageUrl,
     required this.graphUpdate,
     required this.createdAt,
+    this.status = 'pending',
   });
 
   final String id;
@@ -61,6 +62,11 @@ class InfrastructureAnalysisResult {
   final String imageUrl;
   final InfrastructureGraphUpdate graphUpdate;
   final DateTime? createdAt;
+  final String status;
+
+  bool get isPending => status.toLowerCase() == 'pending';
+
+  bool get isGraphApplied => graphUpdate.applied;
 
   factory InfrastructureAnalysisResult.fromJson(Map<String, dynamic> json) {
     return InfrastructureAnalysisResult(
@@ -89,29 +95,57 @@ class InfrastructureAnalysisResult {
       createdAt: json['created_at'] == null
           ? null
           : DateTime.tryParse(json['created_at'].toString()),
+      status: json['status']?.toString() ?? 'pending',
     );
   }
 }
 
 class InfrastructureMapPoint {
   const InfrastructureMapPoint({
+    required this.id,
     required this.latitude,
     required this.longitude,
     required this.score,
     required this.quality,
+    this.status,
+    this.createdAt,
+    this.authorName,
   });
 
+  final String id;
   final double latitude;
   final double longitude;
   final int score;
   final String quality;
+  final String? status;
+  final DateTime? createdAt;
+  final String? authorName;
+
+  bool get isActive {
+    final normalized = status?.toLowerCase();
+    return normalized == null || normalized == 'active';
+  }
+
+  bool get isPending => status?.toLowerCase() == 'pending';
+
+  bool get isHidden {
+    final normalized = status?.toLowerCase();
+    return normalized == 'hidden' || normalized == 'dismissed';
+  }
 
   factory InfrastructureMapPoint.fromJson(Map<String, dynamic> json) {
     return InfrastructureMapPoint(
+      id: json['id']?.toString() ?? '',
       latitude: (json['latitude'] as num? ?? 0).toDouble(),
       longitude: (json['longitude'] as num? ?? 0).toDouble(),
       score: (json['score'] as num? ?? 0).round(),
       quality: json['quality']?.toString() ?? 'REGULAR',
+      status: json['status']?.toString(),
+      createdAt: json['created_at'] == null
+          ? null
+          : DateTime.tryParse(json['created_at'].toString()),
+      authorName: json['author_name']?.toString() ??
+          json['user_name']?.toString(),
     );
   }
 }

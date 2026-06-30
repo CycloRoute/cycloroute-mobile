@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/app/routes.dart';
+import 'package:cyclerisk/core/navigation/web_route_history.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
 
 class SessionHandler {
@@ -14,6 +15,8 @@ class SessionHandler {
     if (context == null) {
       return;
     }
+
+    replaceWebHash(AppRoutes.login);
 
     final messenger = ScaffoldMessenger.maybeOf(context);
     final l10n = appL10n(context);

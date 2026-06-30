@@ -11,6 +11,8 @@ class ObstacleReport {
     this.severity = ObstacleSeverity.medium,
     this.status,
     this.createdAt,
+    this.updatedAt,
+    this.expiresAt,
     this.reporterName,
   });
 
@@ -23,13 +25,20 @@ class ObstacleReport {
   final ObstacleSeverity severity;
   final String? status;
   final DateTime? createdAt;
+  final DateTime? updatedAt;
+  final DateTime? expiresAt;
   final String? reporterName;
 
   bool get isActive {
     final normalized = status?.toLowerCase();
-    return normalized == null ||
-        normalized == 'active' ||
-        normalized == 'pending';
+    return normalized == null || normalized == 'active';
+  }
+
+  bool get isPending => status?.toLowerCase() == 'pending';
+
+  bool get isDismissed {
+    final normalized = status?.toLowerCase();
+    return normalized == 'dismissed' || normalized == 'hidden';
   }
 
   factory ObstacleReport.fromJson(Map<String, dynamic> json) {
@@ -45,6 +54,12 @@ class ObstacleReport {
       createdAt: json['created_at'] == null
           ? null
           : DateTime.tryParse(json['created_at'].toString()),
+      updatedAt: json['updated_at'] == null
+          ? null
+          : DateTime.tryParse(json['updated_at'].toString()),
+      expiresAt: json['expires_at'] == null
+          ? null
+          : DateTime.tryParse(json['expires_at'].toString()),
       reporterName: json['reporter_name']?.toString() ??
           json['user_name']?.toString(),
     );

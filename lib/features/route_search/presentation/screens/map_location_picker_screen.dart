@@ -5,7 +5,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
-import 'package:cyclerisk/core/config/app_config.dart';
+import 'package:cyclerisk/features/map/domain/cyclo_map_layers.dart';
+import 'package:cyclerisk/features/map/presentation/widgets/cyclo_map.dart';
 import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/providers/auth_provider.dart';
 import 'package:cyclerisk/core/providers/location_provider.dart';
@@ -152,42 +153,18 @@ class _MapLocationPickerScreenState extends State<MapLocationPickerScreen> {
           Expanded(
             child: Stack(
               children: [
-                FlutterMap(
+                CycloMap(
                   mapController: _mapController,
-                  options: MapOptions(
-                    center: center,
-                    zoom: 15,
-                    minZoom: 3,
-                    maxZoom: 20,
-                    onPositionChanged: (position, hasGesture) {
-                      if (!hasGesture) {
-                        return;
-                      }
-                      _onMapMoved(position);
-                    },
-                  ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: AppConfig.mapTileUrlTemplate,
-                      subdomains: AppConfig.mapTileSubdomains,
-                      userAgentPackageName: 'com.cycloroute.mobile',
-                      maxNativeZoom: 18,
-                      maxZoom: 20,
-                      backgroundColor: AppColors.background,
-                    ),
-                    RichAttributionWidget(
-                      attributions: [
-                        TextSourceAttribution(
-                          AppConfig.mapAttribution,
-                          textStyle: const TextStyle(
-                            color: AppColors.textSecondary,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                  center: center,
+                  zoom: 15,
+                  height: double.infinity,
+                  borderRadius: 0,
+                  layers: CycloMapLayers.locationPicker,
+                  showCenterPin: false,
+                  onPositionChanged: (position, hasGesture) {
+                    if (!hasGesture) return;
+                    _onMapMoved(position);
+                  },
                 ),
                 IgnorePointer(
                   child: Center(

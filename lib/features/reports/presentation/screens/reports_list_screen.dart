@@ -21,21 +21,35 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
   List<ObstacleReport> _reports = const [];
   bool _loading = true;
   String? _errorMessage;
+  bool _loadInFlight = false;
 
   @override
   void initState() {
     super.initState();
-    _load();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _load());
   }
 
   Future<void> _load() async {
+    if (_loadInFlight) {
+      return;
+    }
+    _loadInFlight = true;
+
     final l10n = appL10n(context);
-    final token = context.read<AuthProvider>().accessToken;
-    if (token == null) {
+    final auth = context.read<AuthProvider>();
+    await auth.ensureInitialized();
+    if (!mounted) {
+      _loadInFlight = false;
+      return;
+    }
+
+    final token = auth.accessToken;
+    if (token == null || token.isEmpty) {
       setState(() {
         _loading = false;
         _errorMessage = l10n.pleaseSignInAgain;
       });
+      _loadInFlight = false;
       return;
     }
 
@@ -55,6 +69,7 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
       if (!mounted) return;
       setState(() => _errorMessage = l10n.couldNotLoadReports);
     } finally {
+      _loadInFlight = false;
       if (mounted) setState(() => _loading = false);
     }
   }

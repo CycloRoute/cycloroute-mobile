@@ -55,13 +55,56 @@ class AppLocalizationsEs extends AppLocalizations {
   String get reportObstacle => 'Reportar obstáculo';
 
   @override
-  String get collaborativeMap => 'Mapa colaborativo';
+  String get collaborativeMap => 'Mapa revisor';
 
   @override
   String get aiRouteCoverage => 'Cobertura IA de rutas';
 
   @override
   String get reviewInfrastructure => 'Revisar infraestructura';
+
+  @override
+  String get submitInfrastructureCapture => 'Enviar captura de infraestructura';
+
+  @override
+  String get infrastructureAdminTitle => 'Administrar infraestructura IA';
+
+  @override
+  String get infrastructureAdminSubtitle =>
+      'Revisa capturas enviadas por colaboradores, aprueba las válidas para actualizar el grafo o rechaza las incorrectas.';
+
+  @override
+  String get infrastructureAdminListTab => 'Cola';
+
+  @override
+  String get infrastructureAdminMapTab => 'Mapa';
+
+  @override
+  String get infrastructureEmptyPending =>
+      'No hay capturas pendientes de revisión.';
+
+  @override
+  String get infrastructureEmptyActive => 'No hay capturas activas en el mapa.';
+
+  @override
+  String get infrastructureEmptyHidden => 'No hay capturas rechazadas.';
+
+  @override
+  String get infrastructureEmptyAll =>
+      'Aún no hay capturas de infraestructura IA.';
+
+  @override
+  String infrastructureSubmittedBy(String name) {
+    return 'Enviado por $name';
+  }
+
+  @override
+  String get couldNotLoadInfrastructure =>
+      'No se pudo cargar la infraestructura IA';
+
+  @override
+  String get infrastructureApproveGraphHint =>
+      'Al aprobar se actualiza el grafo de rutas. Rechazar oculta la captura sin tocar el grafo.';
 
   @override
   String get obstacleReports => 'Reportes de obstáculos';
@@ -465,14 +508,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get submitReport => 'Enviar reporte';
 
   @override
-  String get noReportsYet => 'Aún no hay reportes';
+  String get noReportsYet => 'Aún no hay reporte de obstáculos :(';
 
   @override
   String get couldNotLoadReports => 'No se pudieron cargar los reportes';
 
   @override
   String get couldNotLoadCollaborativeMap =>
-      'No se pudo cargar el mapa colaborativo';
+      'No se pudo cargar el mapa revisor';
 
   @override
   String get couldNotLoadCoverage => 'No se pudo cargar la cobertura';
@@ -1126,4 +1169,182 @@ class AppLocalizationsEs extends AppLocalizations {
 
   @override
   String get showFewerSteps => 'Ver menos';
+
+  @override
+  String get reviewerMap => 'Mapa revisor';
+
+  @override
+  String get mapLayerObstacles => 'Obstáculos';
+
+  @override
+  String get mapLayerInfrastructure => 'Infraestructura';
+
+  @override
+  String get mapLayerCoverage => 'Cobertura grafo';
+
+  @override
+  String get moderationApprove => 'Aprobar';
+
+  @override
+  String get moderationReject => 'Rechazar / Ocultar';
+
+  @override
+  String get moderationPending => 'Pendiente';
+
+  @override
+  String get reportAwaitingReview => 'Pendiente de revisión';
+
+  @override
+  String get communityReportPendingMessage =>
+      'Gracias. Tu reporte está pendiente de revisión antes de aparecer en el mapa.';
+
+  @override
+  String get moderationActive => 'Activos';
+
+  @override
+  String get moderationHidden => 'Rechazados';
+
+  @override
+  String get moderationAll => 'Todos';
+
+  @override
+  String get editReport => 'Editar';
+
+  @override
+  String get deleteReport => 'Eliminar';
+
+  @override
+  String get confirmDeleteReport => '¿Eliminar este reporte de obstáculo?';
+
+  @override
+  String get saveChanges => 'Guardar cambios';
+
+  @override
+  String get couldNotUpdateReport => 'No se pudo actualizar el reporte';
+
+  @override
+  String get obstacleTimeRemaining => 'Tiempo restante';
+
+  @override
+  String get obstacleVisibleUntilLabel => 'Visible hasta';
+
+  @override
+  String obstacleVisibleUntil(String date) {
+    return 'Visible hasta $date';
+  }
+
+  @override
+  String get obstacleNoExpiry => 'Sin fecha de caducidad';
+
+  @override
+  String get obstacleExpired => 'Caducado';
+
+  @override
+  String obstacleTimeRemainingDays(int days) {
+    return 'Quedan $days días';
+  }
+
+  @override
+  String obstacleTimeRemainingHours(int hours) {
+    return 'Quedan $hours horas';
+  }
+
+  @override
+  String obstacleTimeRemainingMinutes(int minutes) {
+    return 'Quedan $minutes minutos';
+  }
+
+  @override
+  String get obstacleReportedAt => 'Reportado';
+
+  @override
+  String get obstacleAuthor => 'Autor';
+
+  @override
+  String get obstacleActiveDuration => 'Días visible en mapa';
+
+  @override
+  String get analysisResultTitle => 'Resultado del análisis';
+
+  @override
+  String get analysisResultSubtitle =>
+      'La IA revisó tu foto y actualizó el mapa ciclista cerca de esta ubicación.';
+
+  @override
+  String get analysisResultScoreLabel => 'de 100';
+
+  @override
+  String get qualityGoodTitle => 'Infraestructura buena';
+
+  @override
+  String get qualityGoodDescription =>
+      'La zona se ve segura y cómoda para pedalear. Las rutas cercanas favorecerán este tramo.';
+
+  @override
+  String get qualityRegularTitle => 'Infraestructura regular';
+
+  @override
+  String get qualityRegularDescription =>
+      'Hay elementos mejorables. La puntuación se integró en rutas cercanas con peso moderado.';
+
+  @override
+  String get qualityBadTitle => 'Infraestructura deficiente';
+
+  @override
+  String get qualityBadDescription =>
+      'La escena muestra riesgos para ciclistas (tráfico, obstáculos o falta de infraestructura). Las rutas cercanas fueron penalizadas para proteger al ciclista.';
+
+  @override
+  String get graphImpactTitle => 'Impacto en mapa y rutas';
+
+  @override
+  String get graphImpactDescription =>
+      'El motor ajustó aristas del grafo cerca de tu GPS para que futuras rutas reflejen lo detectado.';
+
+  @override
+  String get graphImpactPendingDescription =>
+      'El análisis quedó en pendiente. El grafo solo se actualizará cuando un administrador apruebe esta captura.';
+
+  @override
+  String get graphUpdatePendingApproval =>
+      'Pendiente de aprobación — grafo aún sin cambios';
+
+  @override
+  String graphEdgesWouldUpdate(int count) {
+    return 'Aristas estimadas al aprobar: $count';
+  }
+
+  @override
+  String get infrastructurePendingReviewTitle => 'Pendiente de aprobación';
+
+  @override
+  String get infrastructurePendingReviewBody =>
+      'Tu captura se analizó correctamente. Aparecerá en el mapa revisor y afectará las rutas solo cuando un administrador la apruebe.';
+
+  @override
+  String get infrastructureAdminApproveOnly =>
+      'Solo un administrador puede aprobar esta captura y actualizar el grafo de rutas. Aún puedes rechazar envíos inválidos.';
+
+  @override
+  String get reportSubmittedForReview =>
+      'Enviado a revisión. El mapa y las rutas se actualizarán cuando un administrador lo apruebe.';
+
+  @override
+  String graphRadiusDetail(int meters) {
+    return 'Radio de influencia: $meters m';
+  }
+
+  @override
+  String get graphUpdateApplied => 'Actualización del grafo aplicada';
+
+  @override
+  String get graphUpdateNotApplied =>
+      'No se pudo aplicar al grafo (sin aristas cercanas)';
+
+  @override
+  String get detectionsSubtitle =>
+      'Objetos detectados por el modelo de visión en tu foto:';
+
+  @override
+  String get acceptAndGoHome => 'Aceptar';
 }

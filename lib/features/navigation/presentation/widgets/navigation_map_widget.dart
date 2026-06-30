@@ -6,7 +6,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/features/navigation/presentation/utils/route_segment_polylines.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_option.dart';
-import 'package:cyclerisk/features/shared/widgets/osm_map_widget.dart';
+import 'package:cyclerisk/features/map/domain/cyclo_map_layers.dart';
+import 'package:cyclerisk/features/map/domain/cyclo_map_marker_tap.dart';
+import 'package:cyclerisk/features/map/presentation/widgets/cyclo_map.dart';
+import 'package:cyclerisk/features/reports/presentation/widgets/obstacle_detail_sheet.dart';
 
 class NavigationMapWidget extends StatelessWidget {
   final String routeName;
@@ -20,6 +23,7 @@ class NavigationMapWidget extends StatelessWidget {
   final String navigationInstruction;
   final double progress;
   final bool rotateMapWithHeading;
+  final bool showRouteObstacles;
   final double height;
   final double borderRadius;
 
@@ -36,6 +40,7 @@ class NavigationMapWidget extends StatelessWidget {
     this.navigationInstruction = 'Keep straight',
     this.progress = 0,
     this.rotateMapWithHeading = true,
+    this.showRouteObstacles = true,
     this.height = 280,
     this.borderRadius = 12,
   }) : super(key: key);
@@ -78,13 +83,27 @@ class NavigationMapWidget extends StatelessWidget {
       child: Stack(
         children: [
           Positioned.fill(
-            child: OsmMapWidget(
+            child: CycloMap(
               center: center,
               zoom: 16,
               height: height,
               rotation: mapRotation,
               borderRadius: borderRadius,
-              markers: [
+              layers: CycloMapLayers(
+                showUserLocation: false,
+                showRoutes: true,
+                showCommunityObstacles: showRouteObstacles,
+              ),
+              mode: CycloMapMode.user,
+              polylines: polylines,
+              onMarkerTap: showRouteObstacles
+                  ? (tap) {
+                      if (tap case CycloMapObstacleTap(:final report)) {
+                        showObstacleDetailSheet(context, report);
+                      }
+                    }
+                  : null,
+              extraMarkers: [
                 Marker(
                   width: 48,
                   height: 48,
@@ -139,7 +158,6 @@ class NavigationMapWidget extends StatelessWidget {
                   ),
                 ),
               ],
-              polylines: polylines,
             ),
           ),
           // Route info overlay

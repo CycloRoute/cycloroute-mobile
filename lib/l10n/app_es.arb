@@ -15,9 +15,26 @@
   "savedRoutes": "Rutas guardadas",
   "routeHistory": "Historial de rutas",
   "reportObstacle": "Reportar obstáculo",
-  "collaborativeMap": "Mapa colaborativo",
+  "collaborativeMap": "Mapa revisor",
   "aiRouteCoverage": "Cobertura IA de rutas",
   "reviewInfrastructure": "Revisar infraestructura",
+  "submitInfrastructureCapture": "Enviar captura de infraestructura",
+  "infrastructureAdminTitle": "Administrar infraestructura IA",
+  "infrastructureAdminSubtitle": "Revisa capturas enviadas por colaboradores, aprueba las válidas para actualizar el grafo o rechaza las incorrectas.",
+  "infrastructureAdminListTab": "Cola",
+  "infrastructureAdminMapTab": "Mapa",
+  "infrastructureEmptyPending": "No hay capturas pendientes de revisión.",
+  "infrastructureEmptyActive": "No hay capturas activas en el mapa.",
+  "infrastructureEmptyHidden": "No hay capturas rechazadas.",
+  "infrastructureEmptyAll": "Aún no hay capturas de infraestructura IA.",
+  "infrastructureSubmittedBy": "Enviado por {name}",
+  "@infrastructureSubmittedBy": {
+    "placeholders": {
+      "name": {"type": "String"}
+    }
+  },
+  "couldNotLoadInfrastructure": "No se pudo cargar la infraestructura IA",
+  "infrastructureApproveGraphHint": "Al aprobar se actualiza el grafo de rutas. Rechazar oculta la captura sin tocar el grafo.",
   "obstacleReports": "Reportes de obstáculos",
   "reviewerTools": "Herramientas de revisor",
   "accessDenied": "Acceso denegado",
@@ -155,9 +172,9 @@
   "obstacleSubmitted": "Reporte de obstáculo enviado.",
   "couldNotSubmitReport": "No se pudo enviar el reporte",
   "submitReport": "Enviar reporte",
-  "noReportsYet": "Aún no hay reportes",
+  "noReportsYet": "Aún no hay reporte de obstáculos :(",
   "couldNotLoadReports": "No se pudieron cargar los reportes",
-  "couldNotLoadCollaborativeMap": "No se pudo cargar el mapa colaborativo",
+  "couldNotLoadCollaborativeMap": "No se pudo cargar el mapa revisor",
   "couldNotLoadCoverage": "No se pudo cargar la cobertura",
   "captureInfrastructure": "Capturar infraestructura",
   "reviewerCaptureHint": "Tu foto y GPS mejoran el mapa colaborativo para todos los ciclistas.",
@@ -383,5 +400,86 @@
       "count": {"type": "int"}
     }
   },
-  "showFewerSteps": "Ver menos"
+  "showFewerSteps": "Ver menos",
+  "reviewerMap": "Mapa revisor",
+  "mapLayerObstacles": "Obstáculos",
+  "mapLayerInfrastructure": "Infraestructura",
+  "mapLayerCoverage": "Cobertura grafo",
+  "moderationApprove": "Aprobar",
+  "moderationReject": "Rechazar / Ocultar",
+  "moderationPending": "Pendiente",
+  "reportAwaitingReview": "Pendiente de revisión",
+  "communityReportPendingMessage": "Gracias. Tu reporte está pendiente de revisión antes de aparecer en el mapa.",
+  "moderationActive": "Activos",
+  "moderationHidden": "Rechazados",
+  "moderationAll": "Todos",
+  "editReport": "Editar",
+  "deleteReport": "Eliminar",
+  "confirmDeleteReport": "¿Eliminar este reporte de obstáculo?",
+  "saveChanges": "Guardar cambios",
+  "couldNotUpdateReport": "No se pudo actualizar el reporte",
+  "obstacleTimeRemaining": "Tiempo restante",
+  "obstacleVisibleUntilLabel": "Visible hasta",
+  "obstacleVisibleUntil": "Visible hasta {date}",
+  "@obstacleVisibleUntil": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "obstacleNoExpiry": "Sin fecha de caducidad",
+  "obstacleExpired": "Caducado",
+  "obstacleTimeRemainingDays": "Quedan {days} días",
+  "@obstacleTimeRemainingDays": {
+    "placeholders": {
+      "days": {"type": "int"}
+    }
+  },
+  "obstacleTimeRemainingHours": "Quedan {hours} horas",
+  "@obstacleTimeRemainingHours": {
+    "placeholders": {
+      "hours": {"type": "int"}
+    }
+  },
+  "obstacleTimeRemainingMinutes": "Quedan {minutes} minutos",
+  "@obstacleTimeRemainingMinutes": {
+    "placeholders": {
+      "minutes": {"type": "int"}
+    }
+  },
+  "obstacleReportedAt": "Reportado",
+  "obstacleAuthor": "Autor",
+  "obstacleActiveDuration": "Días visible en mapa",
+  "analysisResultTitle": "Resultado del análisis",
+  "analysisResultSubtitle": "La IA revisó tu foto y actualizó el mapa ciclista cerca de esta ubicación.",
+  "analysisResultScoreLabel": "de 100",
+  "qualityGoodTitle": "Infraestructura buena",
+  "qualityGoodDescription": "La zona se ve segura y cómoda para pedalear. Las rutas cercanas favorecerán este tramo.",
+  "qualityRegularTitle": "Infraestructura regular",
+  "qualityRegularDescription": "Hay elementos mejorables. La puntuación se integró en rutas cercanas con peso moderado.",
+  "qualityBadTitle": "Infraestructura deficiente",
+  "qualityBadDescription": "La escena muestra riesgos para ciclistas (tráfico, obstáculos o falta de infraestructura). Las rutas cercanas fueron penalizadas para proteger al ciclista.",
+  "graphImpactTitle": "Impacto en mapa y rutas",
+  "graphImpactDescription": "El motor ajustó aristas del grafo cerca de tu GPS para que futuras rutas reflejen lo detectado.",
+  "graphImpactPendingDescription": "El análisis quedó en pendiente. El grafo solo se actualizará cuando un administrador apruebe esta captura.",
+  "graphUpdatePendingApproval": "Pendiente de aprobación — grafo aún sin cambios",
+  "graphEdgesWouldUpdate": "Aristas estimadas al aprobar: {count}",
+  "@graphEdgesWouldUpdate": {
+    "placeholders": {
+      "count": {"type": "int"}
+    }
+  },
+  "infrastructurePendingReviewTitle": "Pendiente de aprobación",
+  "infrastructurePendingReviewBody": "Tu captura se analizó correctamente. Aparecerá en el mapa revisor y afectará las rutas solo cuando un administrador la apruebe.",
+  "infrastructureAdminApproveOnly": "Solo un administrador puede aprobar esta captura y actualizar el grafo de rutas. Aún puedes rechazar envíos inválidos.",
+  "reportSubmittedForReview": "Enviado a revisión. El mapa y las rutas se actualizarán cuando un administrador lo apruebe.",
+  "graphRadiusDetail": "Radio de influencia: {meters} m",
+  "@graphRadiusDetail": {
+    "placeholders": {
+      "meters": {"type": "int"}
+    }
+  },
+  "graphUpdateApplied": "Actualización del grafo aplicada",
+  "graphUpdateNotApplied": "No se pudo aplicar al grafo (sin aristas cercanas)",
+  "detectionsSubtitle": "Objetos detectados por el modelo de visión en tu foto:",
+  "acceptAndGoHome": "Aceptar"
 }
