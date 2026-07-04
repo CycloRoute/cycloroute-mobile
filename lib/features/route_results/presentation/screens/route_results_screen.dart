@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:provider/provider.dart';
 import 'package:cyclerisk/core/l10n/localize_api_error.dart';
 import 'package:cyclerisk/core/l10n/l10n.dart';
@@ -13,8 +12,7 @@ import 'package:cyclerisk/features/route_results/data/models/route_option.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_options_result.dart';
 import 'package:cyclerisk/features/route_results/data/models/saved_route_meta.dart';
 import 'package:cyclerisk/features/route_results/data/services/route_api_service.dart';
-import 'package:cyclerisk/features/route_results/presentation/widgets/route_detail_info_row.dart';
-import 'package:cyclerisk/features/route_results/presentation/widgets/route_option_card.dart';
+import 'package:cyclerisk/features/route_results/presentation/widgets/route_option_tab_panel.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_preview_map_widget.dart';
 
 class RouteResultsScreen extends StatefulWidget {
@@ -31,6 +29,7 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
 
   RouteOptionsResult? _result;
   RouteOption? _selectedRoute;
+  bool _detailsExpanded = false;
   bool _loadedArguments = false;
   bool _savingRoute = false;
   bool _startingNavigation = false;
@@ -154,17 +153,24 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
     }
   }
 
-  void _selectRoute(RouteOption route) {
-    setState(() => _selectedRoute = route);
+  void _onRouteTabTap(RouteOption route) {
+    final isSameRoute = _selectedRoute?.routeId == route.routeId;
+
+    setState(() {
+      if (isSameRoute) {
+        _detailsExpanded = !_detailsExpanded;
+      } else {
+        _selectedRoute = route;
+        _detailsExpanded = true;
+      }
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = appL10n(context);
-    final distanceFormat = distanceFormatOf(context);
     final result = _result;
     final selectedRoute = _selectedRoute;
-    final cycloPercent = ((selectedRoute?.cycloScore ?? 0) * 100).round();
 
     if (result == null || selectedRoute == null) {
       return Scaffold(
@@ -182,9 +188,27 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text(l10n.routeOptionsTitle),
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              result.destinationLabel == null
+                  ? l10n.routeOptionsTitle
+                  : l10n.routesTo(result.destinationLabel!),
+              style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w700),
+            ),
+            if (result.originLabel != null)
+              Text(
+                l10n.startingFrom(result.originLabel!),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+          ],
+        ),
         elevation: 0,
-        backgroundColor: Colors.transparent,
+        backgroundColor: AppColors.background,
         foregroundColor: AppColors.textPrimary,
         scrolledUnderElevation: 0,
         actions: [
@@ -201,202 +225,82 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
           ),
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                result.destinationLabel == null
-                    ? l10n.chooseYourRoute
-                    : l10n.routesTo(result.destinationLabel!),
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                  height: 1.05,
-                ),
-              ).animate().fadeIn(duration: 360.ms).slideY(begin: 0.04, end: 0),
-              const SizedBox(height: 6),
-              Text(
-                result.originLabel == null
-                    ? l10n.pickRouteThatFits
-                    : l10n.startingFrom(result.originLabel!),
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
-                  height: 1.35,
-                ),
-              ).animate().fadeIn(delay: 80.ms, duration: 320.ms),
-              if (_errorMessage != null) ...[
-                const SizedBox(height: 12),
-                Text(
-                  _errorMessage!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: AppColors.alertRed,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-              const SizedBox(height: 16),
-              RoutePreviewMapWidget(
-                result: result,
-                selectedRoute: selectedRoute,
-              ).animate().fadeIn(delay: 120.ms, duration: 360.ms),
-              const SizedBox(height: 18),
-              Text(
-                l10n.routeOptionsTitle,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  color: AppColors.textPrimary,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                l10n.reviewRouteOnMap,
+      body: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (_errorMessage != null)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                _errorMessage!,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
+                  color: AppColors.alertRed,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              const SizedBox(height: 12),
-              Container(
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.74),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.divider),
+            ),
+          Expanded(
+            child: RoutePreviewMapWidget(
+              result: result,
+              selectedRoute: selectedRoute,
+              expand: true,
+            ),
+          ),
+          AnimatedSize(
+            duration: const Duration(milliseconds: 280),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.background,
+                border: Border(
+                  top: BorderSide(color: AppColors.divider.withValues(alpha: 0.9)),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(20),
-                  child: Column(
-                    children: result.routes.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final route = entry.value;
-
-                      return Column(
-                        children: [
-                          RouteOptionCard(
-                            route: route,
-                            isSelected:
-                                selectedRoute.routeId == route.routeId,
-                            onSelect: () => _selectRoute(route),
-                          ).animate().fadeIn(
-                            delay: (70 * index).ms,
-                            duration: 320.ms,
-                          ).slideX(begin: 0.03, end: 0),
-                          if (index < result.routes.length - 1)
-                            Divider(
-                              height: 1,
-                              thickness: 1,
-                              color: AppColors.divider.withValues(alpha: 0.7),
-                            ),
-                        ],
-                      );
-                    }).toList(),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.shadow.withValues(alpha: 0.08),
+                    blurRadius: 12,
+                    offset: const Offset(0, -4),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(height: 18),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.76),
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.divider),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(12, 10, 12, 8),
+                    child: Row(
                       children: [
-                        Text(
-                          l10n.selectedRouteSummary,
-                          style: Theme.of(context).textTheme.titleMedium
-                              ?.copyWith(
-                                color: AppColors.textPrimary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          l10n.percentBikeInfra(
-                            (selectedRoute.bikeInfrastructureCoverage * 100)
-                                .round(),
+                        for (var index = 0; index < result.routes.length; index++) ...[
+                          if (index > 0) const SizedBox(width: 8),
+                          RouteOptionTabChip(
+                            route: result.routes[index],
+                            isSelected:
+                                selectedRoute.routeId == result.routes[index].routeId,
+                            isExpanded: _detailsExpanded &&
+                                selectedRoute.routeId == result.routes[index].routeId,
+                            onTap: () => _onRouteTabTap(result.routes[index]),
                           ),
-                          style: Theme.of(context).textTheme.labelMedium
-                              ?.copyWith(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w700,
-                              ),
-                        ),
+                        ],
                       ],
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      '${distanceFormat.formatRouteDistance(selectedRoute.distanceM)} · '
-                      '${l10n.minutesShort(selectedRoute.durationRounded)}',
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.textSecondary,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    RouteDetailInfoRow(
-                      label: l10n.cycloScoreLabel,
-                      value: '$cycloPercent',
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      selectedRoute.why.isEmpty
-                          ? l10n.percentBikeInfra(
-                              (selectedRoute.bikeInfrastructureCoverage * 100)
-                                  .round(),
-                            )
-                          : selectedRoute.why.join(' · '),
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.textPrimary,
-                        height: 1.45,
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().fadeIn(duration: 360.ms),
-              const SizedBox(height: 18),
-              SizedBox(
-                width: double.infinity,
-                height: 54,
-                child: ElevatedButton(
-                  onPressed: _startingNavigation ? null : _startNavigation,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    elevation: 4,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16),
-                    ),
                   ),
-                  child: _startingNavigation
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : Text(
-                          l10n.startNavigation,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                ),
-              ).animate().fadeIn(delay: 220.ms, duration: 360.ms).slideY(
-                begin: 0.08,
-                end: 0,
+                  if (_detailsExpanded)
+                    SizedBox(
+                      height: MediaQuery.sizeOf(context).height * 0.28,
+                      child: RouteOptionTabPanel(
+                        key: ValueKey(selectedRoute.routeId),
+                        route: selectedRoute,
+                        onStartNavigation: _startNavigation,
+                        startingNavigation: _startingNavigation,
+                      ),
+                    ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

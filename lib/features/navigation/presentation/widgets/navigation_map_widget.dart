@@ -1,4 +1,5 @@
 import 'dart:math' as math;
+import 'dart:ui' as ui;
 
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter/material.dart';
@@ -105,33 +106,17 @@ class NavigationMapWidget extends StatelessWidget {
                   : null,
               extraMarkers: [
                 Marker(
-                  width: 48,
-                  height: 48,
+                  width: 54,
+                  height: 54,
                   point: center,
+                  rotate: false,
                   builder: (_) => Transform.rotate(
                     angle: _degreesToRadians(
                       rotateMapWithHeading
                           ? 0
                           : (deviceHeading ?? targetBearing ?? 0),
                     ),
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: AppColors.navigationCyan,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: AppColors.shadow,
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: const Icon(
-                        Icons.navigation_rounded,
-                        color: Colors.white,
-                        size: 26,
-                      ),
-                    ),
+                    child: const _NavigationCursor(),
                   ),
                 ),
                 Marker(
@@ -248,7 +233,6 @@ class NavigationMapWidget extends StatelessWidget {
               relativeTurn: relativeTurn,
               instruction: navigationInstruction,
               progress: progress,
-              mapLockedToHeading: rotateMapWithHeading && deviceHeading != null,
             ),
           ),
         ],
@@ -259,18 +243,89 @@ class NavigationMapWidget extends StatelessWidget {
   double _degreesToRadians(double degrees) => degrees * math.pi / 180;
 }
 
+/// User position puck for turn-by-turn. The chevron points "up" which, in the
+/// heading-up map, always represents the rider's forward direction of travel.
+class _NavigationCursor extends StatelessWidget {
+  const _NavigationCursor();
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 54,
+      height: 54,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          CustomPaint(size: const Size(54, 54), painter: _HeadingBeamPainter()),
+          Container(
+            width: 26,
+            height: 26,
+            decoration: BoxDecoration(
+              color: AppColors.navigationCyan,
+              shape: BoxShape.circle,
+              border: Border.all(color: Colors.white, width: 3),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.shadow,
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+          ),
+          const Align(
+            alignment: Alignment(0, -0.62),
+            child: Icon(
+              Icons.navigation_rounded,
+              color: AppColors.navigationCyan,
+              size: 20,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Paints a translucent cone above the puck, hinting the forward direction.
+class _HeadingBeamPainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final beamPaint = Paint()
+      ..shader = ui.Gradient.radial(center, size.width / 2, [
+        AppColors.navigationCyan.withValues(alpha: 0.32),
+        AppColors.navigationCyan.withValues(alpha: 0.0),
+      ]);
+
+    const spreadRad = 0.9;
+    const startAngle = -math.pi / 2 - spreadRad / 2;
+    final path = ui.Path()
+      ..moveTo(center.dx, center.dy)
+      ..arcTo(
+        Rect.fromCircle(center: center, radius: size.width / 2),
+        startAngle,
+        spreadRad,
+        false,
+      )
+      ..close();
+    canvas.drawPath(path, beamPaint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _HeadingBeamPainter oldDelegate) => false;
+}
+
 class _DirectionBubble extends StatelessWidget {
   const _DirectionBubble({
     required this.relativeTurn,
     required this.instruction,
     required this.progress,
-    required this.mapLockedToHeading,
   });
 
   final double relativeTurn;
   final String instruction;
   final double progress;
-  final bool mapLockedToHeading;
 
   @override
   Widget build(BuildContext context) {
@@ -300,7 +355,7 @@ class _DirectionBubble extends StatelessWidget {
           ),
           const SizedBox(height: 6),
           Text(
-            mapLockedToHeading ? instruction : '$instruction to route',
+            instruction,
             style: Theme.of(context).textTheme.labelSmall?.copyWith(
               fontWeight: FontWeight.w800,
               color: AppColors.textPrimary,

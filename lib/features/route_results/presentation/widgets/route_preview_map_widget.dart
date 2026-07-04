@@ -15,11 +15,13 @@ class RoutePreviewMapWidget extends StatelessWidget {
     required this.result,
     required this.selectedRoute,
     this.height = 240,
+    this.expand = false,
   });
 
   final RouteOptionsResult result;
   final RouteOption selectedRoute;
   final double height;
+  final bool expand;
 
   Color _routeColor(String routeId, {required bool selected}) {
     final color = switch (routeId.toLowerCase()) {
@@ -76,6 +78,61 @@ class RoutePreviewMapWidget extends StatelessWidget {
           ),
     ];
 
+    final map = Stack(
+      children: [
+        expand
+            ? SizedBox.expand(
+                child: CycloMap(
+                  center: bounds.center,
+                  zoom: bounds.zoom,
+                  height: double.infinity,
+                  borderRadius: 0,
+                  layers: CycloMapLayers.routePreview,
+                  polylines: polylines,
+                  extraMarkers: _markers(result),
+                ),
+              )
+            : CycloMap(
+                center: bounds.center,
+                zoom: bounds.zoom,
+                height: height,
+                borderRadius: 0,
+                layers: CycloMapLayers.routePreview,
+                polylines: polylines,
+                extraMarkers: _markers(result),
+              ),
+        Positioned(
+          left: 12,
+          bottom: 12,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.92),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.divider),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _LegendDot(color: _routeColor(selectedRoute.routeId, selected: true)),
+                const SizedBox(width: 6),
+                Text(
+                  selectedRoute.name,
+                  style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+
+    if (expand) {
+      return map;
+    }
+
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20),
@@ -90,16 +147,13 @@ class RoutePreviewMapWidget extends StatelessWidget {
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(20),
-        child: Stack(
-          children: [
-            CycloMap(
-              center: bounds.center,
-              zoom: bounds.zoom,
-              height: height,
-              borderRadius: 0,
-              layers: CycloMapLayers.routePreview,
-              polylines: polylines,
-              extraMarkers: [
+        child: map,
+      ),
+    );
+  }
+
+  List<Marker> _markers(RouteOptionsResult result) {
+    return [
                 Marker(
                   width: 40,
                   height: 40,
@@ -121,37 +175,7 @@ class RoutePreviewMapWidget extends StatelessWidget {
                     icon: Icons.flag_rounded,
                   ),
                 ),
-              ],
-            ),
-            Positioned(
-              left: 12,
-              bottom: 12,
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.92),
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: AppColors.divider),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    _LegendDot(color: _routeColor(selectedRoute.routeId, selected: true)),
-                    const SizedBox(width: 6),
-                    Text(
-                      selectedRoute.name,
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
+              ];
   }
 }
 
