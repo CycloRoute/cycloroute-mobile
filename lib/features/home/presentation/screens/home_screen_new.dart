@@ -35,17 +35,33 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
   bool _showObstacles = false;
   bool _showInfrastructure = false;
   LatLng? _anchoredMapCenter;
+  LocationProvider? _locationProvider;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _attachLocationListener();
+  }
+
+  void _attachLocationListener() {
+    final provider = context.read<LocationProvider>();
+    if (_locationProvider == provider) {
+      return;
+    }
+    _locationProvider?.removeListener(_handleLocationUpdate);
+    _locationProvider = provider;
+    _locationProvider!.addListener(_handleLocationUpdate);
+  }
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    context.read<LocationProvider>().addListener(_handleLocationUpdate);
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final locationProvider = context.read<LocationProvider>();
       await locationProvider.refreshAccessStatus();
       if (locationProvider.hasLocationAccess) {
-        await locationProvider.getCurrentLocation();
+        await _ensureHomeLocation(locationProvider);
       }
       if (!mounted) return;
       _handleLocationUpdate();
@@ -64,15 +80,23 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
 
   @override
   void dispose() {
-    context.read<LocationProvider>().removeListener(_handleLocationUpdate);
+    _locationProvider?.removeListener(_handleLocationUpdate);
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> _ensureHomeLocation(LocationProvider locationProvider) async {
+    if (locationProvider.currentLocation != null) {
+      locationProvider.startLocationUpdates();
+      return;
+    }
+    await locationProvider.getCurrentLocation();
   }
 
   void _handleLocationUpdate() {
     if (!mounted) return;
 
-    final location = context.read<LocationProvider>().currentLocation;
+    final location = _locationProvider?.currentLocation;
     if (location == null || _anchoredMapCenter != null) {
       return;
     }
@@ -91,11 +115,15 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
       return;
     }
 
-    final locationProvider = context.read<LocationProvider>();
+    final locationProvider = _locationProvider;
+    if (locationProvider == null) {
+      return;
+    }
+
     locationProvider.refreshAccessStatus().then((_) async {
       if (!mounted) return;
       if (locationProvider.hasLocationAccess) {
-        await locationProvider.getCurrentLocation();
+        await _ensureHomeLocation(locationProvider);
       }
     });
   }

@@ -21,6 +21,7 @@ class LocationProvider extends ChangeNotifier {
   NavigationLocationAccess _navigationLocationAccess =
       NavigationLocationAccess.denied;
   StreamSubscription<LocationSnapshot>? _locationSubscription;
+  Future<void>? _getCurrentLocationTask;
 
   LatLng? get currentLocation => _currentLocation;
   double? get currentHeading => _currentHeading;
@@ -103,7 +104,13 @@ class LocationProvider extends ChangeNotifier {
     return access;
   }
 
-  Future<void> getCurrentLocation() async {
+  Future<void> getCurrentLocation() {
+    return _getCurrentLocationTask ??= _fetchCurrentLocation().whenComplete(() {
+      _getCurrentLocationTask = null;
+    });
+  }
+
+  Future<void> _fetchCurrentLocation() async {
     _isLoading = true;
     notifyListeners();
 

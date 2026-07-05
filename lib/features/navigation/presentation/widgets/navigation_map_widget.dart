@@ -25,6 +25,7 @@ class NavigationMapWidget extends StatelessWidget {
   final double progress;
   final bool rotateMapWithHeading;
   final bool showRouteObstacles;
+  final bool showEmbeddedOverlays;
   final double height;
   final double borderRadius;
 
@@ -42,6 +43,7 @@ class NavigationMapWidget extends StatelessWidget {
     this.progress = 0,
     this.rotateMapWithHeading = true,
     this.showRouteObstacles = true,
+    this.showEmbeddedOverlays = true,
     this.height = 280,
     this.borderRadius = 12,
   }) : super(key: key);
@@ -145,8 +147,8 @@ class NavigationMapWidget extends StatelessWidget {
               ],
             ),
           ),
-          // Route info overlay
-          Positioned(
+          if (showEmbeddedOverlays)
+            Positioned(
             top: 12,
             left: 12,
             right: 12,
@@ -226,7 +228,8 @@ class NavigationMapWidget extends StatelessWidget {
               ),
             ),
           ),
-          Positioned(
+          if (showEmbeddedOverlays)
+            Positioned(
             right: 14,
             bottom: 14,
             child: _DirectionBubble(

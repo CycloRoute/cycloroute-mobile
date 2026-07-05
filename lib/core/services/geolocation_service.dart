@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -92,41 +94,66 @@ class GeolocationService {
         return null;
       }
 
+      if (kIsWeb) {
+        return _getCurrentLocationSnapshotWeb();
+      }
+
       final position = await Geolocator.getCurrentPosition(
         desiredAccuracy: LocationAccuracy.high,
         timeLimit: const Duration(seconds: 15),
       );
 
-      debugPrint(
-        'Location fix: lat=${position.latitude}, lng=${position.longitude}, '
-        'accuracy=${position.accuracy}',
-      );
-
-      return LocationSnapshot(
-        point: LatLng(position.latitude, position.longitude),
-        heading: position.heading,
-        speed: position.speed,
-        accuracy: position.accuracy,
-        timestamp: position.timestamp,
-      );
+      return _logAndSnapshot(position);
     } catch (e) {
-      debugPrint('Error getting location: $e');
-      try {
-        final lastKnown = await Geolocator.getLastKnownPosition();
-        if (lastKnown != null) {
-          return LocationSnapshot(
-            point: LatLng(lastKnown.latitude, lastKnown.longitude),
-            heading: lastKnown.heading,
-            speed: lastKnown.speed,
-            accuracy: lastKnown.accuracy,
-            timestamp: lastKnown.timestamp,
-          );
-        }
-      } catch (_) {
-        // Fall through to null.
+      return _recoverFromLocationError(e);
+    }
+  }
+
+  Future<LocationSnapshot?> _getCurrentLocationSnapshotWeb() async {
+    final cached = await _readLastKnownSnapshot();
+    if (cached != null) {
+      return cached;
+    }
+
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.medium,
+        timeLimit: const Duration(seconds: 8),
+      );
+      return _logAndSnapshot(position);
+    } catch (e) {
+      return _recoverFromLocationError(e);
+    }
+  }
+
+  Future<LocationSnapshot?> _readLastKnownSnapshot() async {
+    try {
+      final lastKnown = await Geolocator.getLastKnownPosition();
+      if (lastKnown == null) {
+        return null;
       }
+      return _toSnapshot(lastKnown);
+    } catch (_) {
       return null;
     }
+  }
+
+  LocationSnapshot _logAndSnapshot(Position position) {
+    debugPrint(
+      'Location fix: lat=${position.latitude}, lng=${position.longitude}, '
+      'accuracy=${position.accuracy}',
+    );
+    return _toSnapshot(position);
+  }
+
+  Future<LocationSnapshot?> _recoverFromLocationError(Object error) async {
+    if (error is! TimeoutException) {
+      debugPrint('Error getting location: $error');
+    } else if (!kIsWeb) {
+      debugPrint('Error getting location: $error');
+    }
+
+    return _readLastKnownSnapshot();
   }
 
   Stream<LocationSnapshot> getNavigationLocationStream({

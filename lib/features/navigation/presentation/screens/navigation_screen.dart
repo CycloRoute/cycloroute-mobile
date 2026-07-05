@@ -331,6 +331,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                       deviceHeading: deviceHeading,
                       navigationInstruction: controller.instruction,
                       progress: controller.progress,
+                      showEmbeddedOverlays: false,
                       height: constraints.maxHeight,
                       borderRadius: 0,
                     );
@@ -346,25 +347,34 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   children: [
                     const BackgroundLocationWarningBanner(),
                     const SizedBox(height: 8),
-                    _InstructionCard(
-                  instruction: controller.instruction,
-                  stepType: step?.type ?? 'continue',
-                  streetName: step?.name,
-                  distanceLabel: _distanceLabel(distanceFormat, step),
-                  stepSegment: step?.segment,
-                  progress: controller.progress,
-                  progressPercent: progressPercent,
-                  routeDistanceLabel: distanceFormat.formatRouteDistance(
-                    route?.distanceM ?? 0,
-                  ),
-                  durationMin: route?.durationRounded ?? 0,
-                  bikeInfraPercent:
-                      ((route?.bikeInfrastructureCoverage ?? 0) * 100).round(),
-                  isRerouting: controller.isRerouting,
-                  bannerText: _bannerText(l10n, controller),
-                  offRoute: controller.distanceToRouteM > 40,
-                  offRouteLabel: l10n.offRoute,
-                  l10n: l10n,
+                    AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 220),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      child: _InstructionCard(
+                        key: ValueKey(
+                          '${step?.instruction}-${step?.type}-${step?.name}',
+                        ),
+                        instruction: controller.instruction,
+                        stepType: step?.type ?? 'continue',
+                        streetName: step?.name,
+                        distanceLabel: _distanceLabel(distanceFormat, step),
+                        stepSegment: step?.segment,
+                        progress: controller.progress,
+                        progressPercent: progressPercent,
+                        routeDistanceLabel: distanceFormat.formatRouteDistance(
+                          route?.distanceM ?? 0,
+                        ),
+                        durationMin: route?.durationRounded ?? 0,
+                        bikeInfraPercent:
+                            ((route?.bikeInfrastructureCoverage ?? 0) * 100)
+                                .round(),
+                        isRerouting: controller.isRerouting,
+                        bannerText: _bannerText(l10n, controller),
+                        offRoute: controller.distanceToRouteM > 40,
+                        offRouteLabel: l10n.offRoute,
+                        l10n: l10n,
+                      ),
                     ),
                   ],
                 ),
@@ -422,6 +432,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
 
 class _InstructionCard extends StatelessWidget {
   const _InstructionCard({
+    super.key,
     required this.instruction,
     required this.stepType,
     required this.progress,

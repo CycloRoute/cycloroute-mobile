@@ -19,7 +19,11 @@ class _RouteCoverageScreenState extends State<RouteCoverageScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<LocationProvider>().getCurrentLocation();
+      if (!mounted) return;
+      final locationProvider = context.read<LocationProvider>();
+      if (locationProvider.currentLocation == null) {
+        locationProvider.getCurrentLocation();
+      }
     });
   }
 
