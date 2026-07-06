@@ -339,6 +339,12 @@
   "distance": "Distancia",
   "time": "Tiempo",
   "minutesShort": "{minutes} min",
+  "estimatedArrivalTime": "Llegada ~{time}",
+  "@estimatedArrivalTime": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "percentBikeInfra": "{value}% infra ciclista",
   "resumeNavigationTitle": "¿Reanudar navegación?",
   "resumeNavigationMessage": "Tienes una ruta activa hacia {destination}.",

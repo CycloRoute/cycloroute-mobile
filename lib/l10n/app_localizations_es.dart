@@ -986,6 +986,11 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String estimatedArrivalTime(String time) {
+    return 'Llegada ~$time';
+  }
+
+  @override
   String get resumeNavigationTitle => '¿Reanudar navegación?';
 
   @override

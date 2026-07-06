@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:cyclerisk/app/routes.dart';
@@ -20,6 +21,7 @@ import 'package:cyclerisk/features/navigation/presentation/widgets/active_alert_
 import 'package:cyclerisk/features/navigation/presentation/widgets/current_segment_panel.dart';
 import 'package:cyclerisk/features/navigation/presentation/widgets/navigation_map_widget.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_option.dart';
+import 'package:cyclerisk/features/route_results/presentation/widgets/route_detail_preview_panel.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
 
 class NavigationScreen extends StatefulWidget {
@@ -359,16 +361,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
                         stepType: step?.type ?? 'continue',
                         streetName: step?.name,
                         distanceLabel: _distanceLabel(distanceFormat, step),
-                        stepSegment: step?.segment,
-                        progress: controller.progress,
                         progressPercent: progressPercent,
-                        routeDistanceLabel: distanceFormat.formatRouteDistance(
-                          route?.distanceM ?? 0,
-                        ),
-                        durationMin: route?.durationRounded ?? 0,
-                        bikeInfraPercent:
-                            ((route?.bikeInfrastructureCoverage ?? 0) * 100)
-                                .round(),
                         isRerouting: controller.isRerouting,
                         bannerText: _bannerText(l10n, controller),
                         offRoute: controller.distanceToRouteM > 40,
@@ -415,8 +408,11 @@ class _NavigationScreenState extends State<NavigationScreen> {
                   bottom: 0,
                   left: 0,
                   right: 0,
-                  child: _RouteBottomSheet(
+                  child: _NavigationRoutePanel(
                     route: route,
+                    stepSegment: step?.segment,
+                    progress: controller.progress,
+                    distanceFormat: distanceFormat,
                     onEndRoute: _confirmEndRoute,
                     l10n: l10n,
                   ),
@@ -435,18 +431,13 @@ class _InstructionCard extends StatelessWidget {
     super.key,
     required this.instruction,
     required this.stepType,
-    required this.progress,
     required this.progressPercent,
-    required this.routeDistanceLabel,
-    required this.durationMin,
-    required this.bikeInfraPercent,
     required this.isRerouting,
     required this.offRoute,
     required this.offRouteLabel,
     required this.l10n,
     this.streetName,
     this.distanceLabel,
-    this.stepSegment,
     this.bannerText,
   });
 
@@ -454,12 +445,7 @@ class _InstructionCard extends StatelessWidget {
   final String stepType;
   final String? streetName;
   final String? distanceLabel;
-  final RouteStepSegment? stepSegment;
-  final double progress;
   final int progressPercent;
-  final String routeDistanceLabel;
-  final int durationMin;
-  final int bikeInfraPercent;
   final bool isRerouting;
   final bool offRoute;
   final String offRouteLabel;
@@ -585,67 +571,103 @@ class _InstructionCard extends StatelessWidget {
               ),
             ],
           ),
-          if (stepSegment != null) ...[
-            const SizedBox(height: 12),
-            CurrentSegmentPanel(segment: stepSegment!, l10n: l10n),
-          ],
-          const SizedBox(height: 12),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: AppColors.divider,
-              valueColor: const AlwaysStoppedAnimation<Color>(
-                AppColors.navigationCyan,
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              _CompactStat(
-                icon: Icons.straighten,
-                label: l10n.distance,
-                value: routeDistanceLabel,
-              ),
-              Container(width: 1, height: 30, color: AppColors.divider),
-              _CompactStat(
-                icon: Icons.schedule,
-                label: l10n.time,
-                value: l10n.minutesShort(durationMin),
-              ),
-              Container(width: 1, height: 30, color: AppColors.divider),
-              _CompactStat(
-                icon: Icons.directions_bike_rounded,
-                label: l10n.bikeInfrastructure,
-                value: l10n.percentBikeInfra(bikeInfraPercent),
-                color: AppColors.primary,
-              ),
-            ],
-          ),
         ],
       ),
     );
   }
 }
 
-class _RouteBottomSheet extends StatelessWidget {
-  const _RouteBottomSheet({
+class _NavigationRoutePanel extends StatefulWidget {
+  const _NavigationRoutePanel({
     required this.route,
     required this.onEndRoute,
     required this.l10n,
+    required this.distanceFormat,
+    this.stepSegment,
+    this.progress = 0,
   });
 
   final RouteOption route;
+  final RouteStepSegment? stepSegment;
+  final double progress;
+  final DistanceFormat distanceFormat;
   final VoidCallback onEndRoute;
   final AppLocalizations l10n;
 
   @override
+  State<_NavigationRoutePanel> createState() => _NavigationRoutePanelState();
+}
+
+class _NavigationRoutePanelState extends State<_NavigationRoutePanel> {
+  bool _expanded = false;
+
+  void _openFullRouteDetails() {
+    final route = widget.route;
+    final l10n = widget.l10n;
+    final distanceFormat = widget.distanceFormat;
+
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: AppColors.background,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return DraggableScrollableSheet(
+          expand: false,
+          initialChildSize: 0.82,
+          minChildSize: 0.45,
+          maxChildSize: 0.95,
+          builder: (context, scrollController) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+              child: Column(
+                children: [
+                  Container(
+                    width: 40,
+                    height: 4,
+                    decoration: BoxDecoration(
+                      color: AppColors.divider,
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    route.name,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      controller: scrollController,
+                      child: RouteDetailPreviewPanel(
+                        route: route,
+                        l10n: l10n,
+                        distanceFormat: distanceFormat,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final route = widget.route;
+    final l10n = widget.l10n;
+    final distanceFormat = widget.distanceFormat;
     final infraPercent = (route.bikeInfrastructureCoverage * 100).round();
-    final hasSteps = route.steps.isNotEmpty;
+    final durationMin = route.durationRounded;
+    final remainingMin = _remainingMinutes(durationMin, widget.progress);
+    final arrivalLabel = _estimatedArrivalLabel(context, l10n, remainingMin);
 
     return Container(
       decoration: const BoxDecoration(
@@ -675,40 +697,122 @@ class _RouteBottomSheet extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(height: 14),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    route.name,
-                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+            const SizedBox(height: 10),
+            Material(
+              color: Colors.transparent,
+              child: InkWell(
+                borderRadius: BorderRadius.circular(12),
+                onTap: () => setState(() => _expanded = !_expanded),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              route.name,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                          Icon(
+                            _expanded
+                                ? Icons.expand_less_rounded
+                                : Icons.expand_more_rounded,
+                            color: AppColors.textSecondary,
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      _RouteSummaryLine(
+                        durationLabel: l10n.minutesShort(remainingMin),
+                        distanceLabel: distanceFormat.formatRouteDistance(
+                          route.distanceM,
+                        ),
+                        arrivalLabel: arrivalLabel,
+                      ),
+                    ],
                   ),
-                ),
-                Text(
-                  l10n.percentBikeInfra(infraPercent),
-                  style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                    color: AppColors.primary,
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-              ],
-            ),
-            if (!hasSteps) ...[
-              const SizedBox(height: 8),
-              Text(
-                l10n.noTurnByTurnSteps,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
                 ),
               ),
-            ],
-            const SizedBox(height: 14),
+            ),
+            AnimatedCrossFade(
+              firstCurve: Curves.easeOutCubic,
+              secondCurve: Curves.easeInCubic,
+              crossFadeState: _expanded
+                  ? CrossFadeState.showSecond
+                  : CrossFadeState.showFirst,
+              duration: const Duration(milliseconds: 220),
+              sizeCurve: Curves.easeOutCubic,
+              firstChild: const SizedBox(width: double.infinity),
+              secondChild: Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    if (widget.stepSegment != null)
+                      CurrentSegmentPanel(
+                        segment: widget.stepSegment!,
+                        l10n: l10n,
+                      ),
+                    if (widget.stepSegment != null) const SizedBox(height: 12),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(6),
+                      child: LinearProgressIndicator(
+                        value: widget.progress,
+                        minHeight: 8,
+                        backgroundColor: AppColors.divider,
+                        valueColor: const AlwaysStoppedAnimation<Color>(
+                          AppColors.navigationCyan,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.directions_bike_rounded,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.bikeInfrastructure,
+                          style: Theme.of(context).textTheme.labelMedium
+                              ?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        const Spacer(),
+                        Text(
+                          l10n.percentBikeInfra(infraPercent),
+                          style: Theme.of(context).textTheme.labelLarge
+                              ?.copyWith(
+                                color: AppColors.primary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                        ),
+                      ],
+                    ),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: _openFullRouteDetails,
+                        icon: const Icon(Icons.open_in_full_rounded, size: 18),
+                        label: Text(l10n.routeDetailTitle),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: onEndRoute,
+                onPressed: widget.onEndRoute,
                 icon: const Icon(Icons.stop_circle_outlined),
                 label: Text(l10n.endRoute),
               ),
@@ -718,38 +822,61 @@ class _RouteBottomSheet extends StatelessWidget {
       ),
     );
   }
+
+  int _remainingMinutes(int totalMinutes, double progress) {
+    if (totalMinutes <= 0) {
+      return 0;
+    }
+    final remaining =
+        ((1 - progress.clamp(0.0, 1.0)) * totalMinutes).round();
+    return remaining.clamp(0, totalMinutes);
+  }
+
+  String _estimatedArrivalLabel(
+    BuildContext context,
+    AppLocalizations l10n,
+    int remainingMinutes,
+  ) {
+    final arrival = DateTime.now().add(Duration(minutes: remainingMinutes));
+    final locale = Localizations.localeOf(context).toString();
+    final timeLabel = DateFormat.jm(locale).format(arrival);
+    return l10n.estimatedArrivalTime(timeLabel);
+  }
 }
 
-class _CompactStat extends StatelessWidget {
-  const _CompactStat({
-    required this.icon,
-    required this.label,
-    required this.value,
-    this.color,
+class _RouteSummaryLine extends StatelessWidget {
+  const _RouteSummaryLine({
+    required this.durationLabel,
+    required this.distanceLabel,
+    required this.arrivalLabel,
   });
 
-  final IconData icon;
-  final String label;
-  final String value;
-  final Color? color;
+  final String durationLabel;
+  final String distanceLabel;
+  final String arrivalLabel;
 
   @override
   Widget build(BuildContext context) {
-    return Expanded(
-      child: Column(
-        children: [
-          Icon(icon, size: 20, color: color ?? AppColors.navigationCyan),
-          const SizedBox(height: 6),
-          Text(
-            value,
-            style: Theme.of(
-              context,
-            ).textTheme.labelMedium?.copyWith(fontWeight: FontWeight.w700),
-          ),
-          const SizedBox(height: 2),
-          Text(label, style: Theme.of(context).textTheme.labelSmall),
-        ],
-      ),
+    final valueStyle = Theme.of(context).textTheme.labelLarge?.copyWith(
+      fontWeight: FontWeight.w800,
+      color: AppColors.textPrimary,
+    );
+    final separatorStyle = Theme.of(context).textTheme.labelLarge?.copyWith(
+      color: AppColors.textSecondary,
+      fontWeight: FontWeight.w600,
+    );
+
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      spacing: 8,
+      runSpacing: 4,
+      children: [
+        Text(durationLabel, style: valueStyle),
+        Text('·', style: separatorStyle),
+        Text(distanceLabel, style: valueStyle),
+        Text('·', style: separatorStyle),
+        Text(arrivalLabel, style: valueStyle),
+      ],
     );
   }
 }

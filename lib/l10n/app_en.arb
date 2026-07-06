@@ -384,6 +384,12 @@
       "minutes": {"type": "int"}
     }
   },
+  "estimatedArrivalTime": "Arrive ~{time}",
+  "@estimatedArrivalTime": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
   "resumeNavigationTitle": "Resume navigation?",
   "resumeNavigationMessage": "You have an active route to {destination}.",
   "@resumeNavigationMessage": {

@@ -1856,6 +1856,12 @@ abstract class AppLocalizations {
   /// **'{minutes} min'**
   String minutesShort(int minutes);
 
+  /// No description provided for @estimatedArrivalTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Arrive ~{time}'**
+  String estimatedArrivalTime(String time);
+
   /// No description provided for @resumeNavigationTitle.
   ///
   /// In en, this message translates to:
