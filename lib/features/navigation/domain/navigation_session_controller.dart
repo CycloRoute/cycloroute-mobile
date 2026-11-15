@@ -84,6 +84,12 @@ class NavigationSessionController extends ChangeNotifier
   bool isRerouting = false;
   bool hasArrived = false;
   bool isInBackground = false;
+  bool offerResumeAfterBackground = false;
+  DateTime? _backgroundedAt;
+
+  static const backgroundResumeThreshold = Duration(seconds: 2);
+  static const rerouteRequestTimeout = Duration(seconds: 20);
+  static const rerouteFailedBanner = 'reroute_failed';
   String? bannerMessage;
   String? errorMessage;
   RiskAlert? activeNearbyAlert;
@@ -207,6 +213,8 @@ class NavigationSessionController extends ChangeNotifier
     }
 
     _navigationStartedAt = DateTime.now();
+    _backgroundedAt = null;
+    offerResumeAfterBackground = false;
     session = args.session;
     activeRoute = args.activeRoute;
     preference = args.preference;
@@ -264,14 +272,38 @@ class NavigationSessionController extends ChangeNotifier
     switch (state) {
       case AppLifecycleState.resumed:
         isInBackground = false;
+        final backgroundedAt = _backgroundedAt;
+        _backgroundedAt = null;
+        final away = backgroundedAt == null
+            ? Duration.zero
+            : DateTime.now().difference(backgroundedAt);
+        if (backgroundedAt != null &&
+            away >= backgroundResumeThreshold &&
+            isSessionActive) {
+          offerResumeAfterBackground = true;
+        }
         notifyListeners();
-      case AppLifecycleState.inactive:
+        break;
       case AppLifecycleState.paused:
       case AppLifecycleState.hidden:
         isInBackground = true;
+        if (isSessionActive) {
+          _backgroundedAt ??= DateTime.now();
+        }
+        notifyListeners();
+        break;
+      case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
         break;
     }
+  }
+
+  void acknowledgeResumeOffer() {
+    if (!offerResumeAfterBackground) {
+      return;
+    }
+    offerResumeAfterBackground = false;
+    notifyListeners();
   }
 
   Future<void> _completeNavigation() async {
@@ -387,6 +419,8 @@ class NavigationSessionController extends ChangeNotifier
     await _ttsService.stop();
     await _backgroundCoordinator.onNavigationEnded();
     _navigationStartedAt = null;
+    _backgroundedAt = null;
+    offerResumeAfterBackground = false;
     session = null;
     activeRoute = null;
     destination = null;
@@ -616,18 +650,21 @@ class NavigationSessionController extends ChangeNotifier
     _publishInstructionNotification(_recalculatingLabel);
     notifyListeners();
 
+    final rider = GeoPoint(lat: fix.point.latitude, lng: fix.point.longitude);
     try {
-      final result = await _apiService.reroute(
-        accessToken: token,
-        origin: GeoPoint(lat: fix.point.latitude, lng: fix.point.longitude),
-        destination: destination,
-        preference: preference,
-        bikeProfile: bikeProfile,
-        bearing: _validHeading(fix.heading),
-        accuracyM: fix.accuracy,
-        fastReroute: true,
-        sessionId: session?.id,
-      );
+      final result = await _apiService
+          .reroute(
+            accessToken: token,
+            origin: rider,
+            destination: destination,
+            preference: preference,
+            bikeProfile: bikeProfile,
+            bearing: _validHeading(fix.heading),
+            accuracyM: fix.accuracy,
+            fastReroute: true,
+            sessionId: session?.id,
+          )
+          .timeout(rerouteRequestTimeout);
 
       activeRoute = result.route;
       currentStepIndex = 0;
@@ -639,6 +676,11 @@ class NavigationSessionController extends ChangeNotifier
       _lastMapMatchAt = null;
       _offRouteStreak = 0;
       _offRouteSince = null;
+      final gap = NavigationEngine.minDistanceToPolyline(
+        rider,
+        result.route.coordinates,
+      );
+      distanceToRouteM = gap > NavigationEngine.offRouteThresholdM ? 0 : gap;
       bannerMessage = 'route_updated';
       errorMessage = null;
       _ttsService.resetStepTracking();
@@ -646,17 +688,24 @@ class NavigationSessionController extends ChangeNotifier
       await _persistCache();
       await _loadCommunityAlerts(token: token);
       await _speakStepInstruction();
-    } on ApiException catch (e) {
-      errorMessage = e.message;
-      bannerMessage = null;
+    } on ApiException {
+      _markRerouteFailed();
     } catch (_) {
-      errorMessage = 'reroute_failed';
-      bannerMessage = null;
+      _markRerouteFailed();
     } finally {
       isRerouting = false;
       notifyListeners();
     }
   }
+
+  void _markRerouteFailed() {
+    isRerouting = false;
+    bannerMessage = rerouteFailedBanner;
+    errorMessage = null;
+  }
+
+  @visibleForTesting
+  void markRerouteFailedForTest() => _markRerouteFailed();
 
   Future<void> _persistCache() async {
     final currentSession = session;

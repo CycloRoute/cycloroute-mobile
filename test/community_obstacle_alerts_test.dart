@@ -44,6 +44,6 @@ void main() {
     expect(alert.type, 'community_obstacle');
     expect(alert.severity, 'high');
     expect(alert.message, 'Auto en ciclovía');
-    expect(alert.title, contains('ciclovía'));
+    expect(alert.title, 'Ciclovía bloqueada');
   });
 }

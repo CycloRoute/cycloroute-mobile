@@ -346,6 +346,7 @@
   "couldNotStartNavigation": "No se pudo iniciar la navegación.",
   "recalculatingRoute": "Recalculando ruta...",
   "routeUpdated": "Ruta actualizada",
+  "rerouteFailed": "No se pudo actualizar la ruta. Se mantiene la ruta actual.",
   "offRoute": "Fuera de ruta",
   "noTurnByTurnSteps": "No hay instrucciones turn-by-turn para esta ruta.",
   "endRouteTitle": "¿Terminar ruta?",

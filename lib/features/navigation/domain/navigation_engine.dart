@@ -5,7 +5,8 @@ import 'package:cyclerisk/features/route_search/data/models/geo_point.dart';
 
 class NavigationEngine {
   static const offRouteThresholdM = 40.0;
-  static const rerouteCooldown = Duration(seconds: 8);
+  /// A second off-route event inside this window does not start another reroute.
+  static const rerouteCooldown = Duration(seconds: 25);
   static const offRouteStreakRequired = 2;
   static const offRouteConfirmationDuration = Duration(seconds: 3);
   static const arrivalThresholdM = 30.0;

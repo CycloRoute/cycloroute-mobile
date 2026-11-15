@@ -42,6 +42,12 @@ void main() {
         NavigationEngine.canReroute(
           lastRerouteAt: DateTime.now().subtract(const Duration(seconds: 10)),
         ),
+        isFalse,
+      );
+      expect(
+        NavigationEngine.canReroute(
+          lastRerouteAt: DateTime.now().subtract(const Duration(seconds: 26)),
+        ),
         isTrue,
       );
     });

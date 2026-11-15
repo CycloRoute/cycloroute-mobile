@@ -8,6 +8,37 @@ import 'package:cyclerisk/features/navigation/domain/navigation_session_controll
 
 enum NavigationResumeResult { none, resumed, sessionEnded, deferred }
 
+/// Shared resume prompt. `true` stays with the route, `false` ends it,
+/// `null` keeps the session without opening the map.
+Future<bool?> showNavigationResumeDialog(
+  BuildContext context, {
+  required String destinationLabel,
+}) {
+  final l10n = appL10n(context);
+  return showDialog<bool?>(
+    context: context,
+    barrierDismissible: true,
+    builder: (dialogContext) => AlertDialog(
+      title: Text(l10n.resumeNavigationTitle),
+      content: Text(l10n.resumeNavigationMessage(destinationLabel)),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(false),
+          child: Text(l10n.endRoute),
+        ),
+        TextButton(
+          onPressed: () => Navigator.of(dialogContext).pop(null),
+          child: Text(l10n.notNow),
+        ),
+        FilledButton(
+          onPressed: () => Navigator.of(dialogContext).pop(true),
+          child: Text(l10n.resumeNavigation),
+        ),
+      ],
+    ),
+  );
+}
+
 class NavigationResumeCoordinator {
   NavigationResumeCoordinator._();
 
@@ -54,27 +85,9 @@ class NavigationResumeCoordinator {
         ? args.destinationLabel!
         : l10n.destination;
 
-    final choice = await showDialog<bool?>(
-      context: context,
-      barrierDismissible: true,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(l10n.resumeNavigationTitle),
-        content: Text(l10n.resumeNavigationMessage(destinationLabel)),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(false),
-            child: Text(l10n.endRoute),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(null),
-            child: Text(l10n.notNow),
-          ),
-          FilledButton(
-            onPressed: () => Navigator.of(dialogContext).pop(true),
-            child: Text(l10n.resumeNavigation),
-          ),
-        ],
-      ),
+    final choice = await showNavigationResumeDialog(
+      context,
+      destinationLabel: destinationLabel,
     );
 
     if (!context.mounted) {

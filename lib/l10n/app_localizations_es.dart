@@ -972,6 +972,10 @@ class AppLocalizationsEs extends AppLocalizations {
   String get routeUpdated => 'Ruta actualizada';
 
   @override
+  String get rerouteFailed =>
+      'No se pudo actualizar la ruta. Se mantiene la ruta actual.';
+
+  @override
   String get offRoute => 'Fuera de ruta';
 
   @override

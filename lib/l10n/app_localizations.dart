@@ -1838,6 +1838,12 @@ abstract class AppLocalizations {
   /// **'Route updated'**
   String get routeUpdated;
 
+  /// No description provided for @rerouteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'The route could not be updated. The current route stays.'**
+  String get rerouteFailed;
+
   /// No description provided for @offRoute.
   ///
   /// In en, this message translates to:

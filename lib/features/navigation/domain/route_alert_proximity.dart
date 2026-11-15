@@ -29,6 +29,30 @@ class RouteAlertProximity {
       return null;
     }
 
+    final community = _nearestMatching(
+      alerts: alerts.where((alert) => alert.type == 'community_obstacle'),
+      dismissedIds: dismissedIds,
+      position: position,
+      routePolyline: routePolyline,
+    );
+    if (community != null) {
+      return community;
+    }
+
+    return _nearestMatching(
+      alerts: alerts.where((alert) => alert.type != 'community_obstacle'),
+      dismissedIds: dismissedIds,
+      position: position,
+      routePolyline: routePolyline,
+    );
+  }
+
+  static RiskAlert? _nearestMatching({
+    required Iterable<RiskAlert> alerts,
+    required Set<String> dismissedIds,
+    required GeoPoint position,
+    required List<GeoPoint> routePolyline,
+  }) {
     final alongRouteM = routePolyline.length >= 2
         ? NavigationEngine.distanceAlongRouteM(position, routePolyline)
         : null;

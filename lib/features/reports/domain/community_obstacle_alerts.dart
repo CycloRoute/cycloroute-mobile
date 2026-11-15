@@ -103,28 +103,28 @@ class CommunityObstacleAlerts {
   static _AlertCopy _copyFor(ObstacleReport report) {
     return switch (report.category) {
       ObstacleCategory.blockedLane => const _AlertCopy(
-        title: 'Obstáculo en ciclovía',
+        title: 'Ciclovía bloqueada',
         message: 'Hay un bloqueo reportado por la comunidad en esta zona.',
         recommendation:
             'Reduce la velocidad y prepárate para desviarte con seguridad.',
       ),
       ObstacleCategory.construction => const _AlertCopy(
-        title: 'Obra o cierre reportado',
+        title: 'Obra o cierre',
         message: 'Ciclistas reportaron obras o cierres en este tramo.',
         recommendation: 'Anticipa un desvío y sigue la señalización local.',
       ),
       ObstacleCategory.surfaceDamage => const _AlertCopy(
-        title: 'Mal estado del pavimento',
+        title: 'Pavimento dañado',
         message: 'Se reportó daño en el pavimento en esta zona.',
         recommendation: 'Baja la velocidad y evita maniobras bruscas.',
       ),
       ObstacleCategory.debris => const _AlertCopy(
-        title: 'Escombros o residuos en vía',
+        title: 'Escombros en vía',
         message: 'Hay material u obstáculos reportados en el camino.',
         recommendation: 'Mantente alerta y cede el paso si es necesario.',
       ),
       ObstacleCategory.other => const _AlertCopy(
-        title: 'Obstáculo reportado',
+        title: 'Otro',
         message: 'La comunidad reportó un incidente en esta zona.',
         recommendation: 'Circula con precaución en este tramo.',
       ),

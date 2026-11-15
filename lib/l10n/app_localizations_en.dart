@@ -958,6 +958,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get routeUpdated => 'Route updated';
 
   @override
+  String get rerouteFailed =>
+      'The route could not be updated. The current route stays.';
+
+  @override
   String get offRoute => 'Off route';
 
   @override

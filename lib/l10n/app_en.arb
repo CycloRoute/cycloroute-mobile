@@ -371,6 +371,7 @@
   "couldNotStartNavigation": "Could not start navigation.",
   "recalculatingRoute": "Recalculating route...",
   "routeUpdated": "Route updated",
+  "rerouteFailed": "The route could not be updated. The current route stays.",
   "offRoute": "Off route",
   "noTurnByTurnSteps": "Turn-by-turn steps are not available for this route.",
   "endRouteTitle": "End route?",

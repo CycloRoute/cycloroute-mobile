@@ -8,6 +8,7 @@ import 'package:cyclerisk/core/models/navigation_location_access.dart';
 import 'package:cyclerisk/core/providers/auth_provider.dart';
 import 'package:cyclerisk/core/providers/location_provider.dart';
 import 'package:cyclerisk/features/navigation/domain/navigation_session_controller.dart';
+import 'package:cyclerisk/features/navigation/presentation/navigation_resume_coordinator.dart';
 import 'package:cyclerisk/features/navigation/presentation/widgets/background_location_warning_banner.dart';
 import 'package:cyclerisk/core/providers/compass_provider.dart';
 import 'package:cyclerisk/core/providers/navigation_preferences_provider.dart';
@@ -35,6 +36,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
   bool _initialized = false;
   bool _starting = false;
   bool _arrivalHandled = false;
+  bool _resumePromptOpen = false;
   String? _initErrorKey;
 
   @override
@@ -198,6 +200,44 @@ class _NavigationScreenState extends State<NavigationScreen> {
     Navigator.of(context).pushNamedAndRemoveUntil(AppRoutes.home, (_) => false);
   }
 
+  void _maybeOfferResume(NavigationSessionController controller) {
+    if (!controller.offerResumeAfterBackground ||
+        _resumePromptOpen ||
+        !controller.isSessionActive) {
+      return;
+    }
+    _resumePromptOpen = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _offerResume(controller);
+    });
+  }
+
+  Future<void> _offerResume(NavigationSessionController controller) async {
+    if (!mounted) {
+      return;
+    }
+    controller.acknowledgeResumeOffer();
+    final rawLabel = controller.destinationLabel?.trim();
+    final l10n = appL10n(context);
+    final choice = await showNavigationResumeDialog(
+      context,
+      destinationLabel: rawLabel == null || rawLabel.isEmpty
+          ? l10n.destination
+          : rawLabel,
+    );
+    _resumePromptOpen = false;
+    if (!mounted || choice == true) {
+      return;
+    }
+    if (choice == false) {
+      await controller.cancelNavigation();
+    }
+    if (!mounted) {
+      return;
+    }
+    _goHome();
+  }
+
   String _bannerText(
     AppLocalizations l10n,
     NavigationSessionController controller,
@@ -205,6 +245,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
     return switch (controller.bannerMessage) {
       'recalculating' => l10n.recalculatingRoute,
       'route_updated' => l10n.routeUpdated,
+      'reroute_failed' => l10n.rerouteFailed,
       _ => controller.bannerMessage ?? '',
     };
   }
@@ -288,6 +329,7 @@ class _NavigationScreenState extends State<NavigationScreen> {
             _handleArrival();
           });
         }
+        _maybeOfferResume(controller);
 
         final route = controller.activeRoute;
         final step = controller.currentStep;

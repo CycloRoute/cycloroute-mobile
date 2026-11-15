@@ -144,6 +144,50 @@ void main() {
       expect(nearby, isNotNull);
       expect(nearby!.id, 'seg-1');
     });
+
+    test('approved community obstacle wins over a closer segment alert', () {
+      final segment = RiskAlert(
+        id: 'seg-1',
+        type: 'road_risk',
+        title: 'Tramo de alto riesgo',
+        message: 'Cuidado',
+        recommendation: 'Reduce velocidad',
+        severity: 'high',
+        latitude: 0,
+        longitude: 0.0018,
+        timestamp: DateTime(2026),
+        distanceFromRouteStartM: 200,
+        segmentLengthM: 150,
+      );
+      final community = RiskAlert(
+        id: 'community-1',
+        type: 'community_obstacle',
+        title: 'Ciclovía bloqueada',
+        message: 'Auto estacionado en la ciclovía',
+        recommendation: 'Reduce la velocidad',
+        severity: 'high',
+        latitude: 0,
+        longitude: 0.002,
+        timestamp: DateTime(2026),
+      );
+
+      const polyline = [
+        GeoPoint(lat: 0, lng: 0),
+        GeoPoint(lat: 0, lng: 0.003),
+        GeoPoint(lat: 0, lng: 0.006),
+      ];
+
+      final nearby = RouteAlertProximity.nearestForNavigation(
+        position: const GeoPoint(lat: 0, lng: 0.0018),
+        alerts: [segment, community],
+        dismissedIds: {},
+        routePolyline: polyline,
+      );
+
+      expect(nearby?.id, 'community-1');
+      expect(nearby?.title, 'Ciclovía bloqueada');
+      expect(nearby?.message, 'Auto estacionado en la ciclovía');
+    });
   });
 
   group('NavigationRiskAlertPrompt', () {
