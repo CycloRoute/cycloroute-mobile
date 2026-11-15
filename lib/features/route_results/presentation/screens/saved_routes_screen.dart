@@ -6,6 +6,7 @@ import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/providers/auth_provider.dart';
 import 'package:cyclerisk/core/services/api_exception.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
+import 'package:cyclerisk/core/utils/route_history_format.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_list_models.dart';
 import 'package:cyclerisk/features/route_results/data/services/route_api_service.dart';
 
@@ -78,7 +79,7 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
   @override
   Widget build(BuildContext context) {
     final l10n = appL10n(context);
-    final distanceFormat = distanceFormatOf(context);
+    final localeName = Localizations.localeOf(context).toString();
 
     return Scaffold(
       appBar: AppBar(
@@ -118,16 +119,18 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
                 separatorBuilder: (_, __) => const SizedBox(height: 8),
                 itemBuilder: (context, index) {
                   final item = _items[index];
-                  final route = item.routePayload;
-                  final infraPercent =
-                      ((route?.bikeInfrastructureCoverage ?? 0) * 100).round();
-                  final subtitleParts = <String>[
-                    if (route != null)
-                      distanceFormat.formatRouteDistance(route.distanceM),
-                    if (route != null)
-                      l10n.minutesShort(route.durationRounded),
-                    if (route != null) l10n.percentBikeInfra(infraPercent),
+                  final places = [
+                    if (item.originLabel?.trim().isNotEmpty == true)
+                      item.originLabel!.trim(),
+                    if (item.destinationLabel?.trim().isNotEmpty == true)
+                      item.destinationLabel!.trim(),
                   ];
+                  final dateLabel = item.createdAt == null
+                      ? null
+                      : RouteHistoryFormat.formatCompletedAt(
+                          item.createdAt!,
+                          localeName,
+                        );
 
                   return Card(
                     child: ListTile(
@@ -135,9 +138,16 @@ class _SavedRoutesScreenState extends State<SavedRoutesScreen> {
                         item.name,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
-                      subtitle: subtitleParts.isEmpty
-                          ? Text(item.routeId)
-                          : Text(subtitleParts.join(' · ')),
+                      subtitle: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (places.isNotEmpty) Text(places.join(' → ')),
+                          if (dateLabel != null) Text(dateLabel),
+                          if (places.isEmpty && dateLabel == null)
+                            Text(item.routeId),
+                        ],
+                      ),
+                      isThreeLine: places.isNotEmpty && dateLabel != null,
                       trailing: const Icon(Icons.chevron_right),
                       onTap: () => _openDetail(item),
                     ),

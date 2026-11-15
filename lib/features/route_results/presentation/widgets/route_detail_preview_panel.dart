@@ -7,8 +7,41 @@ import 'package:cyclerisk/features/navigation/domain/route_alerts_resolver.dart'
 import 'package:cyclerisk/features/navigation/presentation/maneuver_icons.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_option.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_segment.dart';
+import 'package:cyclerisk/features/route_results/presentation/widgets/route_detail_info_row.dart';
 import 'package:cyclerisk/features/risk_alert/data/models/risk_alert.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
+
+class RouteDetailSummary {
+  const RouteDetailSummary({
+    required this.distance,
+    required this.estimatedTime,
+    required this.score,
+    required this.coverage,
+    required this.reasons,
+  });
+
+  final String distance;
+  final String estimatedTime;
+  final String score;
+  final String coverage;
+  final List<String> reasons;
+}
+
+RouteDetailSummary buildRouteDetailSummary({
+  required RouteOption route,
+  required AppLocalizations l10n,
+  required DistanceFormat distanceFormat,
+}) {
+  return RouteDetailSummary(
+    distance: distanceFormat.formatRouteDistance(route.distanceM),
+    estimatedTime: l10n.minutesShort(route.durationRounded),
+    score: '${(route.cycloScore * 100).round()}',
+    coverage: l10n.percentBikeInfra(
+      (route.bikeInfrastructureCoverage * 100).round(),
+    ),
+    reasons: route.why,
+  );
+}
 
 class RouteDetailPreviewPanel extends StatelessWidget {
   const RouteDetailPreviewPanel({
@@ -16,11 +49,13 @@ class RouteDetailPreviewPanel extends StatelessWidget {
     required this.route,
     required this.l10n,
     required this.distanceFormat,
+    this.showSummary = true,
   });
 
   final RouteOption route;
   final AppLocalizations l10n;
   final DistanceFormat distanceFormat;
+  final bool showSummary;
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +69,16 @@ class RouteDetailPreviewPanel extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
+        if (showSummary) ...[
+          const SizedBox(height: 12),
+          _RouteSummarySection(
+            route: route,
+            l10n: l10n,
+            distanceFormat: distanceFormat,
+          ),
+        ],
+        const SizedBox(height: 12),
+        _RouteAlertsSection(route: route, l10n: l10n),
         const SizedBox(height: 12),
         _RouteTurnByTurnSection(
           route: route,
@@ -46,8 +91,6 @@ class RouteDetailPreviewPanel extends StatelessWidget {
           l10n: l10n,
           distanceFormat: distanceFormat,
         ),
-        const SizedBox(height: 12),
-        _RouteAlertsSection(route: route, l10n: l10n),
       ],
     );
   }
@@ -173,8 +216,8 @@ class _RouteTurnByTurnSectionState extends State<_RouteTurnByTurnSection> {
   }
 }
 
-class _RouteSegmentsTableSection extends StatelessWidget {
-  const _RouteSegmentsTableSection({
+class _RouteSummarySection extends StatelessWidget {
+  const _RouteSummarySection({
     required this.route,
     required this.l10n,
     required this.distanceFormat,
@@ -186,29 +229,123 @@ class _RouteSegmentsTableSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final segments = route.segments ?? const <RouteSegment>[];
+    final summary = buildRouteDetailSummary(
+      route: route,
+      l10n: l10n,
+      distanceFormat: distanceFormat,
+    );
 
     return _SectionCard(
-      title: l10n.routeSegmentsTitle,
+      title: l10n.selectedRouteSummary,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          RouteDetailInfoRow(label: l10n.distance, value: summary.distance),
+          const SizedBox(height: 8),
+          RouteDetailInfoRow(
+            label: l10n.estimatedTime,
+            value: summary.estimatedTime,
+          ),
+          const SizedBox(height: 8),
+          RouteDetailInfoRow(label: l10n.cycloScoreLabel, value: summary.score),
+          const SizedBox(height: 8),
+          RouteDetailInfoRow(
+            label: l10n.bikeCoverageLabel,
+            value: summary.coverage,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            l10n.recommendationReason,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          if (summary.reasons.isEmpty)
+            Text(
+              summary.coverage,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.textSecondary,
+              ),
+            )
+          else
+            ...summary.reasons.map(
+              (reason) => Padding(
+                padding: const EdgeInsets.only(bottom: 4),
+                child: Text(
+                  reason,
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _RouteSegmentsTableSection extends StatefulWidget {
+  const _RouteSegmentsTableSection({
+    required this.route,
+    required this.l10n,
+    required this.distanceFormat,
+  });
+
+  final RouteOption route;
+  final AppLocalizations l10n;
+  final DistanceFormat distanceFormat;
+
+  @override
+  State<_RouteSegmentsTableSection> createState() =>
+      _RouteSegmentsTableSectionState();
+}
+
+class _RouteSegmentsTableSectionState extends State<_RouteSegmentsTableSection> {
+  static const _collapsedLimit = 6;
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final segments = visibleRouteSegments(
+      widget.route.segments ?? const <RouteSegment>[],
+    );
+    final visible = _expanded || segments.length <= _collapsedLimit
+        ? segments
+        : segments.take(_collapsedLimit).toList();
+
+    return _SectionCard(
+      title: widget.l10n.routeSegmentsTitle,
       child: segments.isEmpty
           ? Text(
-              l10n.noRouteSegments,
+              widget.l10n.noRouteSegments,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
                 color: AppColors.textSecondary,
               ),
             )
           : Column(
               children: [
-                _SegmentTableHeader(l10n: l10n),
+                _SegmentTableHeader(l10n: widget.l10n),
                 const SizedBox(height: 8),
-                ...segments.asMap().entries.map(
+                ...visible.asMap().entries.map(
                   (entry) => _SegmentTableRow(
                     index: entry.key + 1,
                     segment: entry.value,
-                    l10n: l10n,
-                    distanceFormat: distanceFormat,
+                    l10n: widget.l10n,
+                    distanceFormat: widget.distanceFormat,
                   ),
                 ),
+                if (segments.length > _collapsedLimit)
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: TextButton(
+                      onPressed: () => setState(() => _expanded = !_expanded),
+                      child: Text(
+                        _expanded
+                            ? widget.l10n.showFewerSteps
+                            : widget.l10n.showAllSteps(segments.length),
+                      ),
+                    ),
+                  ),
               ],
             ),
     );

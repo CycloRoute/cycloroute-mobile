@@ -142,6 +142,25 @@
   "routeHistoryDetailTitle": "Ruta anterior",
   "routeHistoryMissingPayload": "Esta ruta del historial no tiene datos de navegación.",
   "routeHistoryCompletedAt": "Completada el {date}",
+  "routeHistoryEndedAt": "Terminada el {date}",
+  "@routeHistoryEndedAt": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "lessThanOneMinute": "Menos de 1 min",
+  "estimatedTime": "Tiempo estimado",
+  "bikeCoverageLabel": "Cobertura de ciclovía",
+  "recommendationReason": "Motivo de la recomendación",
+  "routeSuggestedName": "Ruta a {destination}",
+  "@routeSuggestedName": {
+    "placeholders": {
+      "destination": {"type": "String"}
+    }
+  },
+  "saveRouteNameRequired": "Escribe un nombre para la ruta.",
+  "reportStatusActive": "Activo",
+  "reportStatusRejected": "Rechazado",
   "@routeHistoryCompletedAt": {
     "placeholders": {
       "date": {"type": "String"}

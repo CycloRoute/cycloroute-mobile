@@ -39,6 +39,40 @@ void main() {
       expect(item.meta?.bikeProfile, BikeProfile.urban);
       expect(item.routePayload?.distanceM, 4200);
       expect(item.createdAt, isNotNull);
+      expect(item.listTitle, 'Home → Miraflores');
+    });
+
+    test('uses the distance actually ridden when the trip was ended early', () {
+      final item = RouteHistoryItem.fromJson({
+        'id': 'hist-early',
+        'route_id': 'balanced',
+        'created_at': '2026-11-10T23:30:00Z',
+        'selected_route': {
+          'route_id': 'balanced',
+          'distance_m': 7100,
+          'duration_min': 19,
+          'cyclo_score': 0.67,
+          'coordinates': [
+            {'lat': -12.1, 'lng': -77.0},
+            {'lat': -12.2, 'lng': -77.1},
+          ],
+          SavedRouteMeta.storageKey: {
+            'origin': {'lat': -12.1, 'lng': -77.0},
+            'destination': {'lat': -12.2, 'lng': -77.1},
+            'origin_label': 'Ubicación actual',
+            'destination_label': 'Parque Kennedy',
+            'traveled_distance_m': 0,
+            'traveled_duration_min': 0.1,
+            'ride_completed': false,
+          },
+        },
+      });
+
+      expect(item.listTitle, 'Ubicación actual → Parque Kennedy');
+      expect(item.distanceForDisplayM(), 0);
+      expect(item.endedBeforeArrival, isTrue);
+      expect(item.meta?.traveledDurationMin, 0.1);
+      expect(item.routePayload?.distanceM, 7100);
     });
 
     test('falls back to coordinates when meta is missing', () {

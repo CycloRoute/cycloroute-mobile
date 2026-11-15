@@ -123,14 +123,17 @@ class _RouteHistoryScreenState extends State<RouteHistoryScreen> {
                 itemBuilder: (context, index) {
                   final item = _items[index];
                   final route = item.routePayload;
-                  final infraPercent =
-                      ((route?.bikeInfrastructureCoverage ?? 0) * 100).round();
                   final metrics = <String>[
                     if (route != null)
-                      distanceFormat.formatRouteDistance(route.distanceM),
+                      distanceFormat.formatRouteDistance(
+                        item.distanceForDisplayM(),
+                      ),
                     if (route != null)
-                      l10n.minutesShort(route.durationRounded),
-                    if (route != null) l10n.percentBikeInfra(infraPercent),
+                      RouteHistoryFormat.formatDuration(
+                        l10n,
+                        traveledMinutes: item.meta?.traveledDurationMin,
+                        plannedMinutes: route.durationRounded,
+                      ),
                   ];
                   final dateLabel = item.createdAt == null
                       ? null
@@ -142,7 +145,7 @@ class _RouteHistoryScreenState extends State<RouteHistoryScreen> {
                   return Card(
                     child: ListTile(
                       title: Text(
-                        item.displayTitle,
+                        item.listTitle,
                         style: const TextStyle(fontWeight: FontWeight.w700),
                       ),
                       subtitle: Column(

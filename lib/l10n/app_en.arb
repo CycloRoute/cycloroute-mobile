@@ -152,6 +152,25 @@
       "date": {"type": "String"}
     }
   },
+  "routeHistoryEndedAt": "Ended on {date}",
+  "@routeHistoryEndedAt": {
+    "placeholders": {
+      "date": {"type": "String"}
+    }
+  },
+  "lessThanOneMinute": "Less than 1 min",
+  "estimatedTime": "Estimated time",
+  "bikeCoverageLabel": "Bike lane coverage",
+  "recommendationReason": "Why this route",
+  "routeSuggestedName": "Route to {destination}",
+  "@routeSuggestedName": {
+    "placeholders": {
+      "destination": {"type": "String"}
+    }
+  },
+  "saveRouteNameRequired": "Enter a name for the route.",
+  "reportStatusActive": "Active",
+  "reportStatusRejected": "Rejected",
   "manualObstacleReport": "Report obstacle",
   "obstacleReportHint": "Pin the exact spot on the map. Other cyclists get alerts when riding nearby.",
   "obstacleCategoryTitle": "Obstacle type",

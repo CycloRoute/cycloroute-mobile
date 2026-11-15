@@ -96,6 +96,27 @@ class RouteHistoryItem {
   bool get canNavigate =>
       routePayload != null && origin != null && destination != null;
 
+  String get listTitle {
+    final origin = originLabel?.trim();
+    final destination = destinationLabel?.trim();
+    if (origin != null &&
+        origin.isNotEmpty &&
+        destination != null &&
+        destination.isNotEmpty) {
+      return '$origin → $destination';
+    }
+    if (destination != null && destination.isNotEmpty) {
+      return destination;
+    }
+    return displayTitle;
+  }
+
+  double distanceForDisplayM() {
+    return meta?.traveledDistanceM ?? routePayload?.distanceM ?? 0;
+  }
+
+  bool get endedBeforeArrival => meta?.rideCompleted == false;
+
   String get displayTitle {
     if (name?.trim().isNotEmpty == true) {
       return name!.trim();

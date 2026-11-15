@@ -1,3 +1,11 @@
+const minListedSegmentDistanceM = 50.0;
+
+List<RouteSegment> visibleRouteSegments(Iterable<RouteSegment> segments) {
+  return segments
+      .where((segment) => segment.distanceM >= minListedSegmentDistanceM)
+      .toList();
+}
+
 class RouteSegment {
   const RouteSegment({
     required this.fromIndex,

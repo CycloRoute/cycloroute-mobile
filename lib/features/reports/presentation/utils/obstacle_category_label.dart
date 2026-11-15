@@ -1,4 +1,5 @@
 import 'package:cyclerisk/features/reports/data/models/obstacle_category.dart';
+import 'package:cyclerisk/features/reports/data/models/obstacle_report.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
 
 class ObstacleCategoryLabel {
@@ -12,6 +13,19 @@ class ObstacleCategoryLabel {
       ObstacleCategory.debris => l10n.obstacleCategoryDebris,
       ObstacleCategory.other => l10n.obstacleCategoryOther,
     };
+  }
+
+  static String status(AppLocalizations l10n, ObstacleReport report) {
+    if (report.isPending) {
+      return l10n.moderationPending;
+    }
+    if (report.isDismissed) {
+      return l10n.reportStatusRejected;
+    }
+    if (report.status?.toLowerCase() == 'active') {
+      return l10n.reportStatusActive;
+    }
+    return l10n.moderationPending;
   }
 
   static String severity(AppLocalizations l10n, ObstacleSeverity value) {

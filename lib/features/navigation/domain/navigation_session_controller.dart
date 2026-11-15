@@ -88,6 +88,7 @@ class NavigationSessionController extends ChangeNotifier
   String? errorMessage;
   RiskAlert? activeNearbyAlert;
 
+  DateTime? _navigationStartedAt;
   DateTime? _lastRerouteAt;
   DateTime? _lastMapMatchAt;
   DateTime? _offRouteSince;
@@ -205,6 +206,7 @@ class NavigationSessionController extends ChangeNotifier
       return;
     }
 
+    _navigationStartedAt = DateTime.now();
     session = args.session;
     activeRoute = args.activeRoute;
     preference = args.preference;
@@ -300,6 +302,21 @@ class NavigationSessionController extends ChangeNotifier
     notifyListeners();
   }
 
+  double _traveledDistanceM(RouteOption route) {
+    if (hasArrived) {
+      return route.distanceM;
+    }
+    return (route.distanceM * progress).clamp(0.0, route.distanceM);
+  }
+
+  double _traveledDurationMin() {
+    final started = _navigationStartedAt;
+    if (started == null) {
+      return 0;
+    }
+    return DateTime.now().difference(started).inSeconds / 60.0;
+  }
+
   GeoPoint? _resolveHistoryOrigin() {
     final explicit = origin;
     if (explicit != null) {
@@ -355,6 +372,9 @@ class NavigationSessionController extends ChangeNotifier
           destinationLabel: destinationLabel,
           planningPreference: _resolvedPreference,
           bikeProfile: _resolvedBikeProfile,
+          traveledDistanceM: _traveledDistanceM(route),
+          traveledDurationMin: _traveledDurationMin(),
+          rideCompleted: hasArrived,
         ),
       );
     } on ApiException {
@@ -366,6 +386,7 @@ class NavigationSessionController extends ChangeNotifier
     await _stopGps();
     await _ttsService.stop();
     await _backgroundCoordinator.onNavigationEnded();
+    _navigationStartedAt = null;
     session = null;
     activeRoute = null;
     destination = null;

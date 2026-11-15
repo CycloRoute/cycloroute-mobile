@@ -430,6 +430,37 @@ class AppLocalizationsEs extends AppLocalizations {
   }
 
   @override
+  String routeHistoryEndedAt(String date) {
+    return 'Terminada el $date';
+  }
+
+  @override
+  String get lessThanOneMinute => 'Menos de 1 min';
+
+  @override
+  String get estimatedTime => 'Tiempo estimado';
+
+  @override
+  String get bikeCoverageLabel => 'Cobertura de ciclovía';
+
+  @override
+  String get recommendationReason => 'Motivo de la recomendación';
+
+  @override
+  String routeSuggestedName(String destination) {
+    return 'Ruta a $destination';
+  }
+
+  @override
+  String get saveRouteNameRequired => 'Escribe un nombre para la ruta.';
+
+  @override
+  String get reportStatusActive => 'Activo';
+
+  @override
+  String get reportStatusRejected => 'Rechazado';
+
+  @override
   String get manualObstacleReport => 'Reportar obstáculo';
 
   @override

@@ -162,6 +162,7 @@ class _MyReportsScreenState extends State<MyReportsScreen> {
                       ),
                       subtitle: Text(
                         [
+                          ObstacleCategoryLabel.status(l10n, report),
                           report.description,
                           ObstacleCategoryLabel.severity(l10n, report.severity),
                           _formatDate(report.createdAt),

@@ -11,6 +11,7 @@ void main() {
         'id': 'abc',
         'name': 'Work commute',
         'route_id': 'balanced',
+        'created_at': '2026-11-10T23:40:00Z',
         'route_payload': {
           'route_id': 'balanced',
           'distance_m': 4200,
@@ -32,6 +33,8 @@ void main() {
 
       expect(item.meta?.originLabel, 'Home');
       expect(item.meta?.destinationLabel, 'Office');
+      expect(item.createdAt, isNotNull);
+      expect(item.name, 'Work commute');
       expect(item.meta?.planningPreference, RoutePreference.balanced);
       expect(item.meta?.bikeProfile, BikeProfile.urban);
       expect(item.canNavigate, isTrue);

@@ -121,6 +121,14 @@ class ProfileScreen extends StatelessWidget {
 
               ),
 
+              _InfoTile(
+
+                label: l10n.myBike,
+
+                value: user.defaultBikeProfile.label(l10n),
+
+              ),
+
               const SizedBox(height: 24),
 
               OutlinedButton(

@@ -12,6 +12,7 @@ import 'package:cyclerisk/features/route_results/data/models/route_options_resul
 import 'package:cyclerisk/features/route_results/data/models/saved_route_meta.dart';
 import 'package:cyclerisk/features/route_results/data/services/route_api_service.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_detail_info_row.dart';
+import 'package:cyclerisk/features/route_results/presentation/widgets/save_route_name_dialog.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_detail_preview_panel.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_preview_map_widget.dart';
 
@@ -76,6 +77,19 @@ class _RouteHistoryDetailScreenState extends State<RouteHistoryDetailScreen> {
       return;
     }
 
+    final destinationLabel = _item.destinationLabel?.trim();
+    final suggestedName = destinationLabel == null || destinationLabel.isEmpty
+        ? _item.displayTitle
+        : l10n.routeSuggestedName(destinationLabel);
+    if (!mounted) return;
+    final name = await promptSavedRouteName(
+      context,
+      initialName: suggestedName,
+    );
+    if (!mounted || name == null) {
+      return;
+    }
+
     setState(() {
       _savingRoute = true;
       _errorMessage = null;
@@ -85,7 +99,7 @@ class _RouteHistoryDetailScreenState extends State<RouteHistoryDetailScreen> {
       await _routeApiService.saveRoute(
         selectedRoute: route,
         accessToken: token,
-        name: _item.displayTitle,
+        name: name,
         meta: SavedRouteMeta(
           origin: origin,
           destination: destination,
@@ -199,7 +213,9 @@ class _RouteHistoryDetailScreenState extends State<RouteHistoryDetailScreen> {
                   if (_item.createdAt != null) ...[
                     const SizedBox(height: 6),
                     Text(
-                      l10n.routeHistoryCompletedAt(
+                      (_item.endedBeforeArrival
+                              ? l10n.routeHistoryEndedAt
+                              : l10n.routeHistoryCompletedAt)(
                         RouteHistoryFormat.formatCompletedAt(
                           _item.createdAt!,
                           localeName,
@@ -241,12 +257,18 @@ class _RouteHistoryDetailScreenState extends State<RouteHistoryDetailScreen> {
                   const SizedBox(height: 16),
                   RouteDetailInfoRow(
                     label: l10n.distance,
-                    value: distanceFormat.formatRouteDistance(route.distanceM),
+                    value: distanceFormat.formatRouteDistance(
+                      _item.distanceForDisplayM(),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   RouteDetailInfoRow(
-                    label: l10n.time,
-                    value: l10n.minutesShort(route.durationRounded),
+                    label: l10n.estimatedTime,
+                    value: RouteHistoryFormat.formatDuration(
+                      l10n,
+                      traveledMinutes: _item.meta?.traveledDurationMin,
+                      plannedMinutes: route.durationRounded,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   RouteDetailInfoRow(
@@ -279,6 +301,7 @@ class _RouteHistoryDetailScreenState extends State<RouteHistoryDetailScreen> {
                     route: route,
                     l10n: l10n,
                     distanceFormat: distanceFormat,
+                    showSummary: false,
                   ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 12),

@@ -13,6 +13,7 @@ import 'package:cyclerisk/features/route_results/data/models/route_options_resul
 import 'package:cyclerisk/features/route_results/data/models/saved_route_meta.dart';
 import 'package:cyclerisk/features/route_results/data/services/route_api_service.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_option_tab_panel.dart';
+import 'package:cyclerisk/features/route_results/presentation/widgets/save_route_name_dialog.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_preview_map_widget.dart';
 
 class RouteResultsScreen extends StatefulWidget {
@@ -71,6 +72,18 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
       return;
     }
 
+    final destination = result.destinationLabel?.trim();
+    final suggestedName = destination == null || destination.isEmpty
+        ? l10n.saveRoute
+        : l10n.routeSuggestedName(destination);
+    final name = await promptSavedRouteName(
+      context,
+      initialName: suggestedName,
+    );
+    if (!mounted || name == null) {
+      return;
+    }
+
     setState(() {
       _savingRoute = true;
       _errorMessage = null;
@@ -80,7 +93,7 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
       await _routeApiService.saveRoute(
         selectedRoute: selectedRoute,
         accessToken: accessToken,
-        name: 'Ruta a ${result.destinationLabel ?? 'destino'}',
+        name: name,
         meta: SavedRouteMeta(
           origin: result.origin,
           destination: result.destination,

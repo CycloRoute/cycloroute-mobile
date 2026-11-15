@@ -342,6 +342,7 @@ class _SavedRouteDetailScreenState extends State<SavedRouteDetailScreen> {
                     route: route,
                     l10n: l10n,
                     distanceFormat: distanceFormat,
+                    showSummary: false,
                   ),
                   if (_errorMessage != null) ...[
                     const SizedBox(height: 12),

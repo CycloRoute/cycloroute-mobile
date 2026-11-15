@@ -884,6 +884,60 @@ abstract class AppLocalizations {
   /// **'Completed on {date}'**
   String routeHistoryCompletedAt(String date);
 
+  /// No description provided for @routeHistoryEndedAt.
+  ///
+  /// In en, this message translates to:
+  /// **'Ended on {date}'**
+  String routeHistoryEndedAt(String date);
+
+  /// No description provided for @lessThanOneMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'Less than 1 min'**
+  String get lessThanOneMinute;
+
+  /// No description provided for @estimatedTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated time'**
+  String get estimatedTime;
+
+  /// No description provided for @bikeCoverageLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Bike lane coverage'**
+  String get bikeCoverageLabel;
+
+  /// No description provided for @recommendationReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Why this route'**
+  String get recommendationReason;
+
+  /// No description provided for @routeSuggestedName.
+  ///
+  /// In en, this message translates to:
+  /// **'Route to {destination}'**
+  String routeSuggestedName(String destination);
+
+  /// No description provided for @saveRouteNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a name for the route.'**
+  String get saveRouteNameRequired;
+
+  /// No description provided for @reportStatusActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get reportStatusActive;
+
+  /// No description provided for @reportStatusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get reportStatusRejected;
+
   /// No description provided for @manualObstacleReport.
   ///
   /// In en, this message translates to:
