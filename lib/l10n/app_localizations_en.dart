@@ -1113,6 +1113,14 @@ class AppLocalizationsEn extends AppLocalizations {
   String get cycloScoreLabel => 'Cyclo score';
 
   @override
+  String get higherCycloScoreIsNotSafer =>
+      'The higher score does not make it safer: it has less bike infrastructure, and part of the number comes from streets the AI has not evaluated.';
+
+  @override
+  String get lowerCycloScorePrioritizesInfra =>
+      'The score can be lower because this route prioritizes evaluated bike infrastructure, not because it is less safe.';
+
+  @override
   String get selectedRouteSummary => 'Selected route';
 
   @override

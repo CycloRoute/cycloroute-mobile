@@ -395,6 +395,8 @@
   "infraComparisonHint": "Toca una columna para elegir. Los mejores valores de cada fila se resaltan.",
   "comparisonMetric": "Métrica",
   "cycloScoreLabel": "Puntaje Cyclo",
+  "higherCycloScoreIsNotSafer": "El puntaje más alto no la hace más segura: tiene menos ciclovía y parte del número sale de calles sin evaluación de la IA.",
+  "lowerCycloScorePrioritizesInfra": "El puntaje puede ser menor porque prioriza ciclovía evaluada, no porque sea menos segura.",
   "selectedRouteSummary": "Ruta seleccionada",
   "saveRoute": "Guardar ruta",
   "noRouteOptionsLoaded": "No se cargaron opciones de ruta.",

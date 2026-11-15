@@ -31,6 +31,7 @@ RouteDetailSummary buildRouteDetailSummary({
   required RouteOption route,
   required AppLocalizations l10n,
   required DistanceFormat distanceFormat,
+  List<String>? reasons,
 }) {
   return RouteDetailSummary(
     distance: distanceFormat.formatRouteDistance(route.distanceM),
@@ -39,7 +40,7 @@ RouteDetailSummary buildRouteDetailSummary({
     coverage: l10n.percentBikeInfra(
       (route.bikeInfrastructureCoverage * 100).round(),
     ),
-    reasons: route.why,
+    reasons: reasons ?? route.why,
   );
 }
 
@@ -49,12 +50,14 @@ class RouteDetailPreviewPanel extends StatelessWidget {
     required this.route,
     required this.l10n,
     required this.distanceFormat,
+    this.reasons,
     this.showSummary = true,
   });
 
   final RouteOption route;
   final AppLocalizations l10n;
   final DistanceFormat distanceFormat;
+  final List<String>? reasons;
   final bool showSummary;
 
   @override
@@ -75,6 +78,7 @@ class RouteDetailPreviewPanel extends StatelessWidget {
             route: route,
             l10n: l10n,
             distanceFormat: distanceFormat,
+            reasons: reasons,
           ),
         ],
         const SizedBox(height: 12),
@@ -221,11 +225,13 @@ class _RouteSummarySection extends StatelessWidget {
     required this.route,
     required this.l10n,
     required this.distanceFormat,
+    this.reasons,
   });
 
   final RouteOption route;
   final AppLocalizations l10n;
   final DistanceFormat distanceFormat;
+  final List<String>? reasons;
 
   @override
   Widget build(BuildContext context) {
@@ -233,6 +239,7 @@ class _RouteSummarySection extends StatelessWidget {
       route: route,
       l10n: l10n,
       distanceFormat: distanceFormat,
+      reasons: reasons,
     );
 
     return _SectionCard(

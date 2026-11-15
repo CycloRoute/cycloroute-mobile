@@ -1,3 +1,11 @@
+int infrastructureScorePercent(num? raw) {
+  if (raw == null) return 0;
+  final rounded = raw.round();
+  if (rounded < 0) return 0;
+  if (rounded > 100) return 100;
+  return rounded;
+}
+
 class InfrastructureDetection {
   const InfrastructureDetection({
     required this.className,
@@ -71,7 +79,7 @@ class InfrastructureAnalysisResult {
   factory InfrastructureAnalysisResult.fromJson(Map<String, dynamic> json) {
     return InfrastructureAnalysisResult(
       id: json['id']?.toString() ?? '',
-      score: (json['score'] as num? ?? 0).round(),
+      score: infrastructureScorePercent(json['score'] as num?),
       quality: json['quality']?.toString() ?? 'REGULAR',
       latitude: (json['latitude'] as num? ?? 0).toDouble(),
       longitude: (json['longitude'] as num? ?? 0).toDouble(),
@@ -138,7 +146,7 @@ class InfrastructureMapPoint {
       id: json['id']?.toString() ?? '',
       latitude: (json['latitude'] as num? ?? 0).toDouble(),
       longitude: (json['longitude'] as num? ?? 0).toDouble(),
-      score: (json['score'] as num? ?? 0).round(),
+      score: infrastructureScorePercent(json['score'] as num?),
       quality: json['quality']?.toString() ?? 'REGULAR',
       status: json['status']?.toString(),
       createdAt: json['created_at'] == null

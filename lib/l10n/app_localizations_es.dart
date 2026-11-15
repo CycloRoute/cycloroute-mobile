@@ -1129,6 +1129,14 @@ class AppLocalizationsEs extends AppLocalizations {
   String get cycloScoreLabel => 'Puntaje Cyclo';
 
   @override
+  String get higherCycloScoreIsNotSafer =>
+      'El puntaje más alto no la hace más segura: tiene menos ciclovía y parte del número sale de calles sin evaluación de la IA.';
+
+  @override
+  String get lowerCycloScorePrioritizesInfra =>
+      'El puntaje puede ser menor porque prioriza ciclovía evaluada, no porque sea menos segura.';
+
+  @override
   String get selectedRouteSummary => 'Ruta seleccionada';
 
   @override

@@ -461,7 +461,7 @@ class _InfrastructureModerationSheetState
             ),
           ),
           const SizedBox(height: 12),
-          _DetailRow('Score', '${point.score}'),
+          _DetailRow(l10n.cycloScoreLabel, '${point.score}'),
           _DetailRow('Calidad', point.quality),
           if (point.status != null)
             _DetailRow(l10n.moderationPending, point.status!),

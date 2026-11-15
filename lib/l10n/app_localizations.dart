@@ -2096,6 +2096,18 @@ abstract class AppLocalizations {
   /// **'Cyclo score'**
   String get cycloScoreLabel;
 
+  /// No description provided for @higherCycloScoreIsNotSafer.
+  ///
+  /// In en, this message translates to:
+  /// **'The higher score does not make it safer: it has less bike infrastructure, and part of the number comes from streets the AI has not evaluated.'**
+  String get higherCycloScoreIsNotSafer;
+
+  /// No description provided for @lowerCycloScorePrioritizesInfra.
+  ///
+  /// In en, this message translates to:
+  /// **'The score can be lower because this route prioritizes evaluated bike infrastructure, not because it is less safe.'**
+  String get lowerCycloScorePrioritizesInfra;
+
   /// No description provided for @selectedRouteSummary.
   ///
   /// In en, this message translates to:

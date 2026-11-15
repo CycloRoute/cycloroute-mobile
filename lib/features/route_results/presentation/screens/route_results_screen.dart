@@ -305,6 +305,7 @@ class _RouteResultsScreenState extends State<RouteResultsScreen> {
                       child: RouteOptionTabPanel(
                         key: ValueKey(selectedRoute.routeId),
                         route: selectedRoute,
+                        options: result.routes,
                         onStartNavigation: _startNavigation,
                         startingNavigation: _startingNavigation,
                       ),

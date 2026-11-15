@@ -94,6 +94,7 @@ class CycloMapState extends State<CycloMap> {
 
   List<ObstacleReport> _obstacles = const [];
   List<InfrastructureMapPoint> _infraPoints = const [];
+  final NetworkTileProvider _tileProvider = NetworkTileProvider();
   List<RouteCoverageArea> _coverageAreas = const [];
   bool _coverageLoaded = false;
   bool _coverageFailed = false;
@@ -154,6 +155,7 @@ class CycloMapState extends State<CycloMap> {
   @override
   void dispose() {
     _boundsDebounce?.cancel();
+    _tileProvider.httpClient.close();
     super.dispose();
   }
 
@@ -491,11 +493,13 @@ class CycloMapState extends State<CycloMap> {
           urlTemplate: AppConfig.mapTileUrlTemplate,
           subdomains: AppConfig.mapTileSubdomains,
           userAgentPackageName: 'com.cycloroute.mobile',
+          tileProvider: _tileProvider,
           maxNativeZoom: CycloMap.maxTileZoom,
           maxZoom: CycloMap.maxDisplayZoom,
-          keepBuffer: 5,
-          panBuffer: 0,
-          tileDisplay: const TileDisplay.instantaneous(),
+          keepBuffer: 8,
+          panBuffer: 1,
+          tileDisplay: const TileDisplay.fadeIn(),
+          evictErrorTileStrategy: EvictErrorTileStrategy.notVisible,
           backgroundColor: AppColors.background,
         ),
         if (showPolylines) PolylineLayer(polylines: widget.polylines),

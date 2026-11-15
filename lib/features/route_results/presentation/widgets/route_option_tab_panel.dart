@@ -3,6 +3,7 @@ import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/core/utils/distance_format.dart';
 import 'package:cyclerisk/features/route_results/data/models/route_option.dart';
+import 'package:cyclerisk/features/route_results/domain/route_score_explanation.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_detail_info_row.dart';
 import 'package:cyclerisk/features/route_results/presentation/widgets/route_detail_preview_panel.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
@@ -20,11 +21,13 @@ class RouteOptionTabPanel extends StatelessWidget {
   const RouteOptionTabPanel({
     super.key,
     required this.route,
+    required this.options,
     required this.onStartNavigation,
     required this.startingNavigation,
   });
 
   final RouteOption route;
+  final List<RouteOption> options;
   final VoidCallback onStartNavigation;
   final bool startingNavigation;
 
@@ -35,6 +38,12 @@ class RouteOptionTabPanel extends StatelessWidget {
     final accent = routeOptionAccentColor(route.routeId);
     final cycloPercent = (route.cycloScore * 100).round();
     final infraPercent = (route.bikeInfrastructureCoverage * 100).round();
+    final reasons = explainedRouteReasons(
+      route: route,
+      options: options,
+      higherScoreIsNotSafer: l10n.higherCycloScoreIsNotSafer,
+      lowerScorePrioritizesInfra: l10n.lowerCycloScorePrioritizesInfra,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -77,13 +86,13 @@ class RouteOptionTabPanel extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                if (route.why.isEmpty)
+                if (reasons.isEmpty)
                   Text(
                     l10n.percentBikeInfra(infraPercent),
                     style: Theme.of(context).textTheme.bodyMedium,
                   )
                 else
-                  ...route.why.map(
+                  ...reasons.map(
                     (reason) => Padding(
                       padding: const EdgeInsets.only(bottom: 6),
                       child: Row(
@@ -107,6 +116,7 @@ class RouteOptionTabPanel extends StatelessWidget {
                     onPressed: () => _openFullDetails(
                       context,
                       route: route,
+                      reasons: reasons,
                       l10n: l10n,
                       distanceFormat: distanceFormat,
                     ),
@@ -159,6 +169,7 @@ class RouteOptionTabPanel extends StatelessWidget {
   void _openFullDetails(
     BuildContext context, {
     required RouteOption route,
+    required List<String> reasons,
     required AppLocalizations l10n,
     required DistanceFormat distanceFormat,
   }) {
@@ -201,6 +212,7 @@ class RouteOptionTabPanel extends StatelessWidget {
                       controller: scrollController,
                       child: RouteDetailPreviewPanel(
                         route: route,
+                        reasons: reasons,
                         l10n: l10n,
                         distanceFormat: distanceFormat,
                       ),

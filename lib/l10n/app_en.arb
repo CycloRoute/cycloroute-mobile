@@ -454,6 +454,8 @@
   "infraComparisonHint": "Tap a column to select a route. Highlighted values are best in each row.",
   "comparisonMetric": "Metric",
   "cycloScoreLabel": "Cyclo score",
+  "higherCycloScoreIsNotSafer": "The higher score does not make it safer: it has less bike infrastructure, and part of the number comes from streets the AI has not evaluated.",
+  "lowerCycloScorePrioritizesInfra": "The score can be lower because this route prioritizes evaluated bike infrastructure, not because it is less safe.",
   "selectedRouteSummary": "Selected route",
   "saveRoute": "Save route",
   "noRouteOptionsLoaded": "No route options were loaded.",

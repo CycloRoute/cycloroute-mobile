@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/location/location_permission_coordinator.dart';
@@ -13,6 +16,7 @@ class NavigationLocationPermissionCoordinator {
   NavigationLocationPermissionCoordinator._();
 
   static final GeolocationService _geolocationService = GeolocationService();
+  static Future<bool>? _confirmInFlight;
 
   static Future<NavigationLocationAccess> ensureForNavigation(
     BuildContext context, {
@@ -32,7 +36,7 @@ class NavigationLocationPermissionCoordinator {
     }
 
     var permission = await _geolocationService.getLocationPermission();
-    if (_geolocationService.hasBackgroundLocationPermission(permission)) {
+    if (await _backgroundAlreadyGranted(permission)) {
       await _ensureAndroidNotificationPermission();
       return NavigationLocationAccess.background;
     }
@@ -85,13 +89,28 @@ class NavigationLocationPermissionCoordinator {
 
     await _ensureAndroidNotificationPermission();
 
-    if (_geolocationService.hasBackgroundLocationPermission(permission)) {
+    if (await _backgroundAlreadyGranted(permission)) {
       return NavigationLocationAccess.background;
     }
 
     return allowForegroundOnly
         ? NavigationLocationAccess.foregroundOnly
         : NavigationLocationAccess.denied;
+  }
+
+  static Future<bool> _backgroundAlreadyGranted(
+    LocationPermission permission,
+  ) async {
+    if (_geolocationService.hasBackgroundLocationPermission(permission)) {
+      return true;
+    }
+    if (kIsWeb ||
+        (defaultTargetPlatform != TargetPlatform.android &&
+            defaultTargetPlatform != TargetPlatform.iOS)) {
+      return false;
+    }
+    final status = await Permission.locationAlways.status;
+    return status.isGranted;
   }
 
   static Future<void> _ensureAndroidNotificationPermission() async {
@@ -143,19 +162,54 @@ class NavigationLocationPermissionCoordinator {
     required String message,
     required String confirmLabel,
     required String cancelLabel,
+  }) {
+    final inFlight = _confirmInFlight;
+    if (inFlight != null) {
+      return inFlight;
+    }
+    final future = _presentConfirm(
+      context,
+      title: title,
+      message: message,
+      confirmLabel: confirmLabel,
+      cancelLabel: cancelLabel,
+    );
+    _confirmInFlight = future;
+    return future.whenComplete(() {
+      if (identical(_confirmInFlight, future)) {
+        _confirmInFlight = null;
+      }
+    });
+  }
+
+  static Future<bool> _presentConfirm(
+    BuildContext context, {
+    required String title,
+    required String message,
+    required String confirmLabel,
+    required String cancelLabel,
   }) async {
+    if (!context.mounted) {
+      return false;
+    }
+    await _waitUntilRouteSettled(context);
+    if (!context.mounted) {
+      return false;
+    }
+
     final result = await showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
+      barrierDismissible: false,
+      builder: (dialogContext) => AlertDialog(
         title: Text(title),
         content: Text(message),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
+            onPressed: () => Navigator.of(dialogContext).pop(false),
             child: Text(cancelLabel),
           ),
           FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
+            onPressed: () => Navigator.of(dialogContext).pop(true),
             child: Text(confirmLabel),
           ),
         ],
@@ -163,5 +217,34 @@ class NavigationLocationPermissionCoordinator {
     );
 
     return result == true;
+  }
+
+  static Future<void> _waitUntilRouteSettled(BuildContext context) async {
+    final animation = ModalRoute.of(context)?.animation;
+    if (animation != null &&
+        animation.status != AnimationStatus.completed &&
+        animation.status != AnimationStatus.dismissed) {
+      final settled = Completer<void>();
+      void listener(AnimationStatus status) {
+        if (status == AnimationStatus.completed ||
+            status == AnimationStatus.dismissed) {
+          animation.removeStatusListener(listener);
+          if (!settled.isCompleted) {
+            settled.complete();
+          }
+        }
+      }
+
+      animation.addStatusListener(listener);
+      if (animation.status == AnimationStatus.completed ||
+          animation.status == AnimationStatus.dismissed) {
+        animation.removeStatusListener(listener);
+        if (!settled.isCompleted) {
+          settled.complete();
+        }
+      }
+      await settled.future;
+    }
+    await WidgetsBinding.instance.endOfFrame;
   }
 }
