@@ -8,6 +8,7 @@ import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/features/reports/data/models/obstacle_report.dart';
 import 'package:cyclerisk/features/reports/data/services/reports_api_service.dart';
 import 'package:cyclerisk/features/reports/presentation/utils/obstacle_category_label.dart';
+import 'package:cyclerisk/features/reports/presentation/widgets/obstacle_moderation_sheet.dart';
 
 class ReportsListScreen extends StatefulWidget {
   const ReportsListScreen({super.key});
@@ -119,6 +120,17 @@ class _ReportsListScreenState extends State<ReportsListScreen> {
                         ].where((part) => part.isNotEmpty).join(' · '),
                       ),
                       isThreeLine: true,
+                      onTap: () {
+                        showObstacleModerationSheet(
+                          context,
+                          report: report,
+                          api: _reportsApiService,
+                          onChanged: () {
+                            if (!mounted) return;
+                            _load();
+                          },
+                        );
+                      },
                     ),
                   );
                 },

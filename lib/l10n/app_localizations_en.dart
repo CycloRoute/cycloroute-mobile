@@ -554,6 +554,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get couldNotLoadCoverage => 'Could not load coverage';
 
   @override
+  String get noGraphCoverage => 'There is no AI coverage in this area.';
+
+  @override
   String get captureInfrastructure => 'Capture street infrastructure';
 
   @override
@@ -1304,6 +1307,10 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get analysisResultSubtitle =>
       'The AI reviewed your photo and updated the cycling map near this location.';
+
+  @override
+  String get analysisResultPendingSubtitle =>
+      'The AI reviewed your photo. The graph does not change until this capture is approved.';
 
   @override
   String get analysisResultScoreLabel => 'of 100';

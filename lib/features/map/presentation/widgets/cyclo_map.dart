@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 
 import 'package:cyclerisk/core/config/app_config.dart';
+import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/providers/auth_provider.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/features/infrastructure/data/models/infrastructure_models.dart';
@@ -93,7 +94,9 @@ class CycloMapState extends State<CycloMap> {
 
   List<ObstacleReport> _obstacles = const [];
   List<InfrastructureMapPoint> _infraPoints = const [];
-  List<RouteCoveragePoint> _coveragePoints = const [];
+  List<RouteCoverageArea> _coverageAreas = const [];
+  bool _coverageLoaded = false;
+  bool _coverageFailed = false;
   bool _loadingLayers = false;
   Timer? _boundsDebounce;
   LatLng? _lastMovedCenter;
@@ -210,7 +213,9 @@ class CycloMapState extends State<CycloMap> {
       if (layers.showGraphCoverage) {
         futures.add(_loadCoverage(token, bounds));
       } else {
-        _coveragePoints = const [];
+        _coverageAreas = const [];
+        _coverageLoaded = false;
+        _coverageFailed = false;
       }
 
       await Future.wait(futures);
@@ -286,12 +291,25 @@ class CycloMapState extends State<CycloMap> {
   }
 
   Future<void> _loadCoverage(String token, String? bounds) async {
-    final points = await _routeApi.getCoverage(
-      accessToken: token,
-      bounds: bounds,
-    );
-    if (!mounted) return;
-    setState(() => _coveragePoints = points);
+    try {
+      final snapshot = await _routeApi.getCoverage(
+        accessToken: token,
+        bounds: bounds,
+      );
+      if (!mounted) return;
+      setState(() {
+        _coverageAreas = snapshot.areas;
+        _coverageLoaded = true;
+        _coverageFailed = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      setState(() {
+        _coverageAreas = const [];
+        _coverageLoaded = true;
+        _coverageFailed = true;
+      });
+    }
   }
 
   int _boundsRadiusM(double south, double west, double north, double east) {
@@ -321,21 +339,57 @@ class CycloMapState extends State<CycloMap> {
 
   double _toRad(double deg) => deg * math.pi / 180.0;
 
+  List<Polygon> _coveragePolygons() {
+    return [
+      for (final area in _coverageAreas)
+        Polygon(
+          points: [
+            LatLng(area.south, area.west),
+            LatLng(area.north, area.west),
+            LatLng(area.north, area.east),
+            LatLng(area.south, area.east),
+          ],
+          color: AppColors.primary.withValues(alpha: 0.22),
+          borderColor: AppColors.primary,
+          borderStrokeWidth: 2,
+          isFilled: true,
+        ),
+    ];
+  }
+
   List<Marker> _layerMarkers() {
     final markers = <Marker>[];
 
     if (widget.layers.showGraphCoverage) {
-      for (final point in _coveragePoints) {
+      for (final area in _coverageAreas) {
+        if (area.name.trim().isEmpty) continue;
         markers.add(
           Marker(
-            point: LatLng(point.latitude, point.longitude),
-            width: 18,
-            height: 18,
-            builder: (_) => Container(
-              decoration: BoxDecoration(
-                color: CycloMapStyles.coverageColor(point),
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 1.5),
+            point: LatLng(
+              (area.south + area.north) / 2,
+              (area.west + area.east) / 2,
+            ),
+            width: 160,
+            height: 40,
+            builder: (context) => IgnorePointer(
+              child: Center(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.92),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: AppColors.primary),
+                  ),
+                  child: Text(
+                    area.name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
               ),
             ),
           ),
@@ -445,6 +499,8 @@ class CycloMapState extends State<CycloMap> {
           backgroundColor: AppColors.background,
         ),
         if (showPolylines) PolylineLayer(polylines: widget.polylines),
+        if (widget.layers.showGraphCoverage && _coverageAreas.isNotEmpty)
+          PolygonLayer(polygons: _coveragePolygons()),
         if (allMarkers.isNotEmpty) MarkerLayer(markers: allMarkers),
         RichAttributionWidget(
           attributions: [
@@ -487,6 +543,26 @@ class CycloMapState extends State<CycloMap> {
               left: 12,
               bottom: 12,
               child: CycloMapLegend(layers: widget.layers, mode: widget.mode),
+            ),
+          if (widget.layers.showGraphCoverage &&
+              _coverageLoaded &&
+              !_loadingLayers &&
+              _coverageAreas.isEmpty)
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Card(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      _coverageFailed
+                          ? appL10n(context).couldNotLoadCoverage
+                          : appL10n(context).noGraphCoverage,
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ),
             ),
           if (_loadingLayers)
             const Positioned(

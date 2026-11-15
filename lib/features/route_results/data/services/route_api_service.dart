@@ -140,7 +140,7 @@ class RouteApiService {
     );
   }
 
-  Future<List<RouteCoveragePoint>> getCoverage({
+  Future<RouteCoverageSnapshot> getCoverage({
     required String accessToken,
     String? bounds,
   }) async {
@@ -149,7 +149,7 @@ class RouteApiService {
         : '/routes/coverage?bounds=$bounds';
 
     final decoded = await _apiClient.getRaw(path, accessToken: accessToken);
-    return _parseList(decoded, RouteCoveragePoint.fromJson);
+    return RouteCoverageSnapshot.fromDecoded(decoded);
   }
 
   Future<Map<String, dynamic>> getEngineHealth({

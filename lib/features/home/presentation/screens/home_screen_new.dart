@@ -19,6 +19,7 @@ import 'package:cyclerisk/features/map/domain/cyclo_map_layers.dart';
 import 'package:cyclerisk/features/map/domain/cyclo_map_marker_tap.dart';
 import 'package:cyclerisk/features/map/presentation/widgets/cyclo_map.dart';
 import 'package:cyclerisk/features/reports/presentation/widgets/obstacle_detail_sheet.dart';
+import 'package:cyclerisk/features/infrastructure/presentation/widgets/infrastructure_quality_sheet.dart';
 
 class HomeScreenNew extends StatefulWidget {
   const HomeScreenNew({super.key});
@@ -133,8 +134,11 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
   }
 
   void _onMapMarkerTap(CycloMapMarkerTap tap) {
-    if (tap case CycloMapObstacleTap(:final report)) {
-      showObstacleDetailSheet(context, report);
+    switch (tap) {
+      case CycloMapObstacleTap(:final report):
+        showObstacleDetailSheet(context, report);
+      case CycloMapInfrastructureTap(:final point):
+        showInfrastructureQualitySheet(context, point);
     }
   }
 
@@ -185,7 +189,9 @@ class _HomeScreenNewState extends State<HomeScreenNew> with WidgetsBindingObserv
                   mode: CycloMapMode.user,
                   userLocation: location,
                   showLegend: _showObstacles || _showInfrastructure,
-                  onMarkerTap: _showObstacles ? _onMapMarkerTap : null,
+                  onMarkerTap: _showObstacles || _showInfrastructure
+                      ? _onMapMarkerTap
+                      : null,
                 );
               },
             ),

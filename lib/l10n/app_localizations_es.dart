@@ -562,6 +562,9 @@ class AppLocalizationsEs extends AppLocalizations {
   String get couldNotLoadCoverage => 'No se pudo cargar la cobertura';
 
   @override
+  String get noGraphCoverage => 'No hay cobertura de la IA en esta zona.';
+
+  @override
   String get captureInfrastructure => 'Capturar infraestructura';
 
   @override
@@ -1319,6 +1322,10 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get analysisResultSubtitle =>
       'La IA revisó tu foto y actualizó el mapa ciclista cerca de esta ubicación.';
+
+  @override
+  String get analysisResultPendingSubtitle =>
+      'La IA revisó tu foto. El grafo aún no cambia hasta que se apruebe.';
 
   @override
   String get analysisResultScoreLabel => 'de 100';

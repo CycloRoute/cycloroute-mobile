@@ -174,27 +174,58 @@ class RouteHistoryItem {
   }
 }
 
-class RouteCoveragePoint {
-  const RouteCoveragePoint({
-    required this.latitude,
-    required this.longitude,
-    this.coverage,
-    this.scored,
+class RouteCoverageArea {
+  const RouteCoverageArea({
+    required this.id,
+    required this.name,
+    required this.south,
+    required this.west,
+    required this.north,
+    required this.east,
   });
 
-  final double latitude;
-  final double longitude;
-  final double? coverage;
-  final bool? scored;
+  final String id;
+  final String name;
+  final double south;
+  final double west;
+  final double north;
+  final double east;
 
-  factory RouteCoveragePoint.fromJson(Map<String, dynamic> json) {
-    return RouteCoveragePoint(
-      latitude: (json['latitude'] as num? ?? json['lat'] as num? ?? 0)
-          .toDouble(),
-      longitude: (json['longitude'] as num? ?? json['lng'] as num? ?? 0)
-          .toDouble(),
-      coverage: (json['coverage'] as num?)?.toDouble(),
-      scored: json['scored'] as bool?,
+  factory RouteCoverageArea.fromJson(Map<String, dynamic> json) {
+    final bbox = json['bbox'];
+    final box = bbox is Map ? Map<String, dynamic>.from(bbox) : const {};
+    return RouteCoverageArea(
+      id: json['id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      south: (box['south'] as num?)?.toDouble() ?? 0,
+      west: (box['west'] as num?)?.toDouble() ?? 0,
+      north: (box['north'] as num?)?.toDouble() ?? 0,
+      east: (box['east'] as num?)?.toDouble() ?? 0,
     );
+  }
+}
+
+class RouteCoverageSnapshot {
+  const RouteCoverageSnapshot({required this.areas});
+
+  final List<RouteCoverageArea> areas;
+
+  bool get isEmpty => areas.isEmpty;
+
+  factory RouteCoverageSnapshot.fromDecoded(dynamic decoded) {
+    if (decoded is! Map) {
+      return const RouteCoverageSnapshot(areas: []);
+    }
+    final raw = decoded['covered_areas'];
+    if (raw is! List) {
+      return const RouteCoverageSnapshot(areas: []);
+    }
+
+    final areas = <RouteCoverageArea>[];
+    for (final entry in raw) {
+      if (entry is! Map) continue;
+      areas.add(RouteCoverageArea.fromJson(Map<String, dynamic>.from(entry)));
+    }
+    return RouteCoverageSnapshot(areas: areas);
   }
 }

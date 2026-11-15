@@ -5,6 +5,7 @@ import 'package:cyclerisk/app/routes.dart';
 import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/features/infrastructure/data/models/infrastructure_models.dart';
+import 'package:cyclerisk/features/infrastructure/presentation/infrastructure_analysis_copy.dart';
 import 'package:cyclerisk/l10n/app_localizations.dart';
 
 class InfrastructureAnalysisResultArgs {
@@ -42,17 +43,19 @@ class InfrastructureAnalysisResultScreen extends StatelessWidget {
     AppLocalizations l10n,
     String quality,
   ) {
-    switch (quality.toUpperCase()) {
-      case 'GOOD':
-        return (title: l10n.qualityGoodTitle, description: l10n.qualityGoodDescription);
-      case 'BAD':
-        return (title: l10n.qualityBadTitle, description: l10n.qualityBadDescription);
-      default:
-        return (
-          title: l10n.qualityRegularTitle,
-          description: l10n.qualityRegularDescription,
-        );
-    }
+    final title = switch (quality.toUpperCase()) {
+      'GOOD' => l10n.qualityGoodTitle,
+      'BAD' => l10n.qualityBadTitle,
+      _ => l10n.qualityRegularTitle,
+    };
+    return (
+      title: title,
+      description: analysisQualityBody(
+        l10n,
+        pending: result.isPending,
+        quality: quality,
+      ),
+    );
   }
 
   IconData _detectionIcon(String className) {
@@ -109,7 +112,7 @@ class InfrastructureAnalysisResultScreen extends StatelessWidget {
               padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
               children: [
                 Text(
-                  l10n.analysisResultSubtitle,
+                  analysisResultLead(l10n, pending: result.isPending),
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                     color: AppColors.textSecondary,
                     height: 1.45,

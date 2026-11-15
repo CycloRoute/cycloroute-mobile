@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
 import 'package:cyclerisk/features/infrastructure/data/models/infrastructure_models.dart';
 import 'package:cyclerisk/features/reports/data/models/obstacle_report.dart';
-import 'package:cyclerisk/features/route_results/data/models/route_list_models.dart';
 
 class CycloMapStyles {
   const CycloMapStyles._();
@@ -18,14 +17,6 @@ class CycloMapStyles {
       default:
         return AppColors.riskYellow;
     }
-  }
-
-  static Color coverageColor(RouteCoveragePoint point) {
-    final coverage = point.coverage;
-    if (coverage == null) return AppColors.primary;
-    if (coverage >= 0.8) return AppColors.safeGreen;
-    if (coverage >= 0.5) return AppColors.riskYellow;
-    return AppColors.alertRed;
   }
 
   static Color obstacleMarkerColor(ObstacleReport report) {

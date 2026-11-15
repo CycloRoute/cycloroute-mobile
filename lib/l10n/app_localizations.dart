@@ -1130,6 +1130,12 @@ abstract class AppLocalizations {
   /// **'Could not load coverage'**
   String get couldNotLoadCoverage;
 
+  /// No description provided for @noGraphCoverage.
+  ///
+  /// In en, this message translates to:
+  /// **'There is no AI coverage in this area.'**
+  String get noGraphCoverage;
+
   /// No description provided for @captureInfrastructure.
   ///
   /// In en, this message translates to:
@@ -2455,6 +2461,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The AI reviewed your photo and updated the cycling map near this location.'**
   String get analysisResultSubtitle;
+
+  /// No description provided for @analysisResultPendingSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'The AI reviewed your photo. The graph does not change until this capture is approved.'**
+  String get analysisResultPendingSubtitle;
 
   /// No description provided for @analysisResultScoreLabel.
   ///
