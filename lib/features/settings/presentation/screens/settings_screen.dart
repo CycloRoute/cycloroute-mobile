@@ -73,9 +73,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     if (user == null) {
       setState(
-        () => _errorMessage =
-            localizeAuthError(l10n, auth.lastApiError) ??
-            l10n.couldNotUpdatePreference,
+        () => _errorMessage = localizePreferenceSaveError(
+          l10n,
+          auth.lastApiError,
+        ),
       );
       return;
     }

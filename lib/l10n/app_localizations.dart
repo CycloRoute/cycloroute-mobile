@@ -620,6 +620,18 @@ abstract class AppLocalizations {
   /// **'Registration failed. Please try again.'**
   String get registrationFailed;
 
+  /// No description provided for @invalidEmailAddress.
+  ///
+  /// In en, this message translates to:
+  /// **'The email address is not valid.'**
+  String get invalidEmailAddress;
+
+  /// No description provided for @emailAlreadyRegistered.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already registered.'**
+  String get emailAlreadyRegistered;
+
   /// No description provided for @termsAndConditions.
   ///
   /// In en, this message translates to:
@@ -655,6 +667,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Check your email'**
   String get checkYourEmail;
+
+  /// No description provided for @checkYourEmailBody.
+  ///
+  /// In en, this message translates to:
+  /// **'If the email is registered, we sent a code to reset your password.'**
+  String get checkYourEmailBody;
 
   /// No description provided for @continueButton.
   ///

@@ -48,7 +48,7 @@ class _PreferenceOnboardingScreenState
       final lastError = context.read<AuthProvider>().lastApiError;
       setState(
         () => _errorMessage =
-            localizeAuthError(l10n, lastError) ?? l10n.couldNotUpdatePreference,
+            localizePreferenceSaveError(l10n, lastError),
       );
       return;
     }

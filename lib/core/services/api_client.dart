@@ -164,6 +164,7 @@ class ApiClient {
         message.rawMessage,
         statusCode: response.statusCode,
         errorKey: message.errorKey,
+        detail: message.detail,
       );
     }
 
@@ -173,11 +174,22 @@ class ApiClient {
   _ApiErrorPayload _errorMessage(dynamic decoded, int statusCode) {
     if (decoded is Map<String, dynamic>) {
       final message = decoded['message'];
+      final detail = _stringField(decoded['detail']);
       if (message is String && message.isNotEmpty) {
-        return _ApiErrorPayload(rawMessage: message);
+        return _ApiErrorPayload(rawMessage: message, detail: detail);
+      }
+      if (message is Map) {
+        final nested = _stringField(message['message']);
+        final nestedDetail = _stringField(message['detail']) ?? detail;
+        if (nested != null && nested.isNotEmpty) {
+          return _ApiErrorPayload(rawMessage: nested, detail: nestedDetail);
+        }
       }
       if (message is List && message.isNotEmpty) {
-        return _ApiErrorPayload(rawMessage: message.first.toString());
+        return _ApiErrorPayload(
+          rawMessage: message.first.toString(),
+          detail: detail,
+        );
       }
     }
 
@@ -196,11 +208,18 @@ class ApiClient {
 
     return const _ApiErrorPayload(errorKey: ApiErrorKeys.requestFailed);
   }
+
+  String? _stringField(Object? value) {
+    if (value is! String) return null;
+    final trimmed = value.trim();
+    return trimmed.isEmpty ? null : trimmed;
+  }
 }
 
 class _ApiErrorPayload {
-  const _ApiErrorPayload({this.rawMessage = '', this.errorKey});
+  const _ApiErrorPayload({this.rawMessage = '', this.errorKey, this.detail});
 
   final String rawMessage;
   final String? errorKey;
+  final String? detail;
 }

@@ -4,6 +4,7 @@ import 'package:cyclerisk/core/l10n/l10n.dart';
 import 'package:cyclerisk/core/models/location_access_status.dart';
 import 'package:cyclerisk/core/providers/location_provider.dart';
 import 'package:cyclerisk/core/theme/app_colors.dart';
+import 'package:cyclerisk/l10n/app_localizations.dart';
 
 class LocationPermissionBanner extends StatelessWidget {
   const LocationPermissionBanner({super.key});
@@ -18,13 +19,7 @@ class LocationPermissionBanner extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final message = switch (status) {
-      LocationAccessStatus.deniedForever =>
-        l10n.locationPermissionDeniedForeverMessage,
-      LocationAccessStatus.serviceDisabled =>
-        l10n.locationServiceDisabledMessage,
-      _ => l10n.locationPermissionRationale,
-    };
+    final copy = locationPermissionBannerCopy(l10n, status);
 
     return Material(
       elevation: 4,
@@ -47,16 +42,14 @@ class LocationPermissionBanner extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      l10n.locationUnavailable,
+                      copy.title,
                       style: Theme.of(context).textTheme.titleSmall?.copyWith(
                         fontWeight: FontWeight.w800,
                       ),
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      message,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
+                      copy.message,
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                         color: AppColors.textSecondary,
                       ),
@@ -78,4 +71,34 @@ class LocationPermissionBanner extends StatelessWidget {
       ),
     );
   }
+}
+
+class LocationPermissionBannerCopy {
+  const LocationPermissionBannerCopy({
+    required this.title,
+    required this.message,
+  });
+
+  final String title;
+  final String message;
+}
+
+LocationPermissionBannerCopy locationPermissionBannerCopy(
+  AppLocalizations l10n,
+  LocationAccessStatus status,
+) {
+  return switch (status) {
+    LocationAccessStatus.deniedForever => LocationPermissionBannerCopy(
+      title: l10n.locationPermissionDeniedForeverTitle,
+      message: l10n.locationPermissionDeniedForeverMessage,
+    ),
+    LocationAccessStatus.serviceDisabled => LocationPermissionBannerCopy(
+      title: l10n.locationServiceDisabledTitle,
+      message: l10n.locationServiceDisabledMessage,
+    ),
+    _ => LocationPermissionBannerCopy(
+      title: l10n.locationPermissionDeniedTitle,
+      message: l10n.locationPermissionDeniedMessage,
+    ),
+  };
 }

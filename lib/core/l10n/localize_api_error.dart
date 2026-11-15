@@ -21,7 +21,9 @@ String localizeApiError(AppLocalizations l10n, ApiException exception) {
     }
   }
 
-  final raw = exception.message.trim().toLowerCase();
+  final raw = '${exception.message} ${exception.detail ?? ''}'
+      .trim()
+      .toLowerCase();
   if (raw.isEmpty) {
     return _statusFallback(l10n, exception.statusCode);
   }
@@ -46,7 +48,63 @@ String localizeApiError(AppLocalizations l10n, ApiException exception) {
     return l10n.serviceUnavailable;
   }
 
+  final registration = _registrationMessage(l10n, raw);
+  if (registration != null) {
+    return registration;
+  }
+  if (raw.contains('no feasible route') ||
+      raw.contains('no route found between')) {
+    return l10n.noRouteOptionsFound;
+  }
+
   return exception.message;
+}
+
+String localizePreferenceSaveError(
+  AppLocalizations l10n,
+  ApiException? exception,
+) {
+  if (exception == null ||
+      exception.errorKey == ApiErrorKeys.connectFailed ||
+      exception.errorKey == ApiErrorKeys.serviceUnavailable) {
+    return l10n.couldNotUpdatePreference;
+  }
+
+  final localized = localizeApiError(l10n, exception);
+  if (localized == l10n.couldNotConnectApi ||
+      localized == l10n.serviceUnavailable) {
+    return l10n.couldNotUpdatePreference;
+  }
+  return localized;
+}
+
+String? _registrationMessage(AppLocalizations l10n, String raw) {
+  final isRegistration = raw.contains('could not register user') ||
+      raw.contains('session could not be started') ||
+      raw.contains('already been registered') ||
+      raw.contains('already registered') ||
+      raw.contains('email_exists') ||
+      raw.contains('user already') ||
+      raw.contains('invalid email') ||
+      raw.contains('invalid format') ||
+      raw.contains('unable to validate email') ||
+      raw.contains('email_address_invalid');
+  if (!isRegistration) {
+    return null;
+  }
+  if (raw.contains('already been registered') ||
+      raw.contains('already registered') ||
+      raw.contains('email_exists') ||
+      raw.contains('user already')) {
+    return l10n.emailAlreadyRegistered;
+  }
+  if (raw.contains('invalid email') ||
+      raw.contains('invalid format') ||
+      raw.contains('unable to validate email') ||
+      raw.contains('email_address_invalid')) {
+    return l10n.invalidEmailAddress;
+  }
+  return l10n.registrationFailed;
 }
 
 String? localizeAuthError(AppLocalizations l10n, ApiException? exception) {

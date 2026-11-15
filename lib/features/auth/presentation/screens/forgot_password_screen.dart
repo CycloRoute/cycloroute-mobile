@@ -68,7 +68,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         return AlertDialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
           title: Text(dialogL10n.checkYourEmail),
-          content: Text(message),
+          content: Text(dialogL10n.checkYourEmailBody),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(dialogContext).pop(),

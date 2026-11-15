@@ -281,6 +281,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get registrationFailed => 'Registration failed. Please try again.';
 
   @override
+  String get invalidEmailAddress => 'The email address is not valid.';
+
+  @override
+  String get emailAlreadyRegistered => 'This email is already registered.';
+
+  @override
   String get termsAndConditions => 'Terms & Conditions';
 
   @override
@@ -298,6 +304,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get checkYourEmail => 'Check your email';
+
+  @override
+  String get checkYourEmailBody =>
+      'If the email is registered, we sent a code to reset your password.';
 
   @override
   String get continueButton => 'Continue';
