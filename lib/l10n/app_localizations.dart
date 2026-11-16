@@ -698,6 +698,24 @@ abstract class AppLocalizations {
   /// **'Check your inbox for the 6-digit code. It expires in 15 minutes.'**
   String get resetCodeHint;
 
+  /// No description provided for @resendCodeWait.
+  ///
+  /// In en, this message translates to:
+  /// **'If the code has not arrived yet, you can request another in {time}.'**
+  String resendCodeWait(String time);
+
+  /// No description provided for @resendResetCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Resend code'**
+  String get resendResetCode;
+
+  /// No description provided for @resendResetCodeSent.
+  ///
+  /// In en, this message translates to:
+  /// **'We sent another code. Check your spam folder too.'**
+  String get resendResetCodeSent;
+
   /// No description provided for @sixDigitCode.
   ///
   /// In en, this message translates to:

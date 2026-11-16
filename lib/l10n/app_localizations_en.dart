@@ -323,6 +323,18 @@ class AppLocalizationsEn extends AppLocalizations {
       'Check your inbox for the 6-digit code. It expires in 15 minutes.';
 
   @override
+  String resendCodeWait(String time) {
+    return 'If the code has not arrived yet, you can request another in $time.';
+  }
+
+  @override
+  String get resendResetCode => 'Resend code';
+
+  @override
+  String get resendResetCodeSent =>
+      'We sent another code. Check your spam folder too.';
+
+  @override
   String get sixDigitCode => '6-digit code';
 
   @override

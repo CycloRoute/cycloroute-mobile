@@ -326,6 +326,18 @@ class AppLocalizationsEs extends AppLocalizations {
       'Revisa tu bandeja de entrada. El código expira en 15 minutos.';
 
   @override
+  String resendCodeWait(String time) {
+    return 'Si el código aún no llega, podrás pedir otro en $time.';
+  }
+
+  @override
+  String get resendResetCode => 'Reenviar código';
+
+  @override
+  String get resendResetCodeSent =>
+      'Te enviamos otro código. Revisa también el spam.';
+
+  @override
   String get sixDigitCode => 'Código de 6 dígitos';
 
   @override

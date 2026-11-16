@@ -155,8 +155,16 @@ class CycloMapState extends State<CycloMap> {
   @override
   void dispose() {
     _boundsDebounce?.cancel();
-    _tileProvider.httpClient.close();
+    _closeTileClient();
     super.dispose();
+  }
+
+  void _closeTileClient() {
+    try {
+      (_tileProvider as dynamic).httpClient.close();
+    } catch (_) {
+      // The web tile provider does not expose the HTTP client.
+    }
   }
 
   void refreshLayers() => _loadLayers();

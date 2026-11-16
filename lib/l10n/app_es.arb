@@ -105,6 +105,14 @@
   "resetPasswordTitle": "Restablecer contraseña",
   "enterCodeFromEmail": "Ingresa el código de tu correo",
   "resetCodeHint": "Revisa tu bandeja de entrada. El código expira en 15 minutos.",
+  "resendCodeWait": "Si el código aún no llega, podrás pedir otro en {time}.",
+  "@resendCodeWait": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "resendResetCode": "Reenviar código",
+  "resendResetCodeSent": "Te enviamos otro código. Revisa también el spam.",
   "sixDigitCode": "Código de 6 dígitos",
   "newPassword": "Nueva contraseña",
   "updatePassword": "Actualizar contraseña",

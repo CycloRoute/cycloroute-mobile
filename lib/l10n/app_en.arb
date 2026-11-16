@@ -110,6 +110,14 @@
   "resetPasswordTitle": "Reset password",
   "enterCodeFromEmail": "Enter the code from your email",
   "resetCodeHint": "Check your inbox for the 6-digit code. It expires in 15 minutes.",
+  "resendCodeWait": "If the code has not arrived yet, you can request another in {time}.",
+  "@resendCodeWait": {
+    "placeholders": {
+      "time": {"type": "String"}
+    }
+  },
+  "resendResetCode": "Resend code",
+  "resendResetCodeSent": "We sent another code. Check your spam folder too.",
   "sixDigitCode": "6-digit code",
   "newPassword": "New password",
   "updatePassword": "Update password",
